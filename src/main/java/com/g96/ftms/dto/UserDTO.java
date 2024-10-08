@@ -13,6 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+
 @AllArgsConstructor
 public class UserDTO {
 
@@ -27,5 +28,5 @@ public class UserDTO {
     private String address;
     private String account;
     private Set<String> roles;
-
+  
 }
