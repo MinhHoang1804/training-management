@@ -1,10 +1,12 @@
 package com.g96.ftms.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
+
 
 import java.util.Date;
 import java.util.Set;
@@ -12,8 +14,8 @@ import java.util.Set;
 @Data
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
-
 @AllArgsConstructor
 public class UserDTO {
 
@@ -28,5 +30,5 @@ public class UserDTO {
     private String address;
     private String account;
     private Set<String> roles;
-  
+
 }

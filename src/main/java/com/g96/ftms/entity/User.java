@@ -1,8 +1,19 @@
 package com.g96.ftms.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.FetchType;
 import jakarta.validation.constraints.Size;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +23,7 @@ import lombok.Builder;
 
 import java.sql.Date;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,7 +87,9 @@ public class User {
     )
 
 
-    private Set<Role> roles;
+
+    private Set<Role> roles = new HashSet<>();
+
 
 
     @JsonProperty("role")
@@ -86,7 +100,8 @@ public class User {
                 .orElse(null);
     }
     @JsonProperty("roleNames")
-    public String getRoleNames() {
+      public String getRoleNames() {
+
         return roles.stream()
                 .map(Role::getRoleName)
                 .collect(Collectors.toSet()).toString();

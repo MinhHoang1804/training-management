@@ -1,5 +1,6 @@
 package com.g96.ftms.service.user;
 
+import com.g96.ftms.dto.ChangePasswordDTO;
 import com.g96.ftms.dto.JwtResponeDTO;
 import com.g96.ftms.dto.LoginDTO;
 import com.g96.ftms.dto.UserDTO;
@@ -10,7 +11,11 @@ import com.g96.ftms.mapper.Mapper;
 import com.g96.ftms.repository.UserRepository;
 import com.g96.ftms.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +56,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
+        return null;
+    }
+
+    @Override
     public JwtResponeDTO login(LoginDTO loginDTO) {
         User user = findByAccount(loginDTO.getAccount());
         if (user != null && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
@@ -66,14 +76,51 @@ public class UserServiceImpl implements UserService {
             Long expire = jwtTokenProvider.getExpirationDateFromToken(token);
 
             // Trả về JwtResponeDTO với tất cả thông tin cần thiết
-            return new JwtResponeDTO(token, refreshToken, user.getAccount(),  user.getRoleNames(), expire, roles);
+            return new JwtResponeDTO(token, refreshToken, user.getAccount(), user.getRoleNames(), expire, roles);
         } else {
-            throw new RuntimeException(ErrorCode.INVALID_CREDENTIALS.getMessage()); // Ném ra ngoại lệ nếu thông tin không hợp lệ
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_CREDENTIALS); // Ném ra ngoại lệ nếu thông tin không hợp lệ
         }
+
     }
 
+    @Override
+    public boolean changePassword(String account, ChangePasswordDTO changePasswordDTO) {
+        User user = userRepository.findByAccount(account);
+        if (user == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
+        }
+        // Kiểm tra mật khẩu cũ
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.OLD_PASSWORD_INCORRECT);
+        }
+        // Kiểm tra mật khẩu mới và xác nhận
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CONFIRM_PASSWORD_MISMATCH);
+        }
+        // Mã hóa và lưu mật khẩu mới
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+        userRepository.save(user);
+        return true;
+    }
 
+    public ResponseEntity<?> changeUserPassword(ChangePasswordDTO changePasswordDTO, Authentication authentication) {
+        // Kiểm tra xác thực người dùng
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.UNAUTHORIZED); // Hoặc một cách xử lý khác
+        }
 
+        String account = authentication.getName();
+
+        try {
+            changePassword(account, changePasswordDTO); // Gọi phương thức đã có để thay đổi mật khẩu
+        } catch (AppException e) {
+            throw e; // Ném lại ngoại lệ
+        } catch (RuntimeException e) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_CHANGE_ERROR);
+        }
+        return ResponseEntity.ok("Change password successful");
+
+    }
 
     @Override
     public void saveUser(UserDTO userDTO) {
@@ -90,6 +137,11 @@ public class UserServiceImpl implements UserService {
             throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND);
         }
         return Mapper.mapEntityToDto(user, UserDTO.class);
+    }
+
+    @Override
+    public UserDTO getUserDetails(Long userId) {
+        return null;
     }
 
 

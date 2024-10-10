@@ -1,3 +1,4 @@
+
 package com.g96.ftms.service.auth;
 
 import com.g96.ftms.dto.JwtResponeDTO;
@@ -40,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userRepository.findByAccount(loginDTO.getAccount());
             if (user == null) {
-                throw new AppException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_CREDENTIALS);
+                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_CREDENTIALS);
             }
 
             Set<String> roles = user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toSet());
@@ -51,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
 
             return new JwtResponeDTO(token, refreshToken, userDetails.getUsername(), user.getRoleNames(), expire, roles);
         } catch (Exception e) {
-            throw new AppException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_CREDENTIALS);
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_CREDENTIALS);
         }
     }
 }
