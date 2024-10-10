@@ -18,7 +18,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://103.188.82.34:3306/airdrop?useLegacyDatetimeCode=false&serverTimezone=UTC&useJvmCharsetConverters=true&trustServerCertificate=true
+    url: jdbc:mysql://103.188.82.34:3306/ftms?useLegacyDatetimeCode=false&serverTimezone=UTC&useJvmCharsetConverters=true&trustServerCertificate=true
     username: root
     password: 0912481511
     hikari:
