@@ -34,9 +34,17 @@ public class Role {
     @Column(name = "role_name", nullable = false, unique = true, length = 50)
     private String roleName;
 
+    @Column(name = "role_level", nullable = false)
+    private int roleLevel;
+
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users;
 
+    @Override
+    public String toString() {
+        return this.roleName;
+    }
 
 }
+
 

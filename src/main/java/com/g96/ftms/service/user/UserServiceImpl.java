@@ -4,10 +4,12 @@ import com.g96.ftms.dto.ChangePasswordDTO;
 import com.g96.ftms.dto.JwtResponeDTO;
 import com.g96.ftms.dto.LoginDTO;
 import com.g96.ftms.dto.UserDTO;
+import com.g96.ftms.entity.Role;
 import com.g96.ftms.entity.User;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.mapper.Mapper;
+import com.g96.ftms.repository.RoleRepository;
 import com.g96.ftms.repository.UserRepository;
 import com.g96.ftms.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -43,21 +49,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Map<String, Object> getPagedUsers(Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(pageable);
+        List<UserDTO> userDTOs = usersPage.getContent().stream()
+                .map(user -> Mapper.mapEntityToDto(user, UserDTO.class))
+                .collect(Collectors.toList());
+        return Map.of(
+                "users", userDTOs,
+                "currentPage", usersPage.getNumber(),
+                "totalItems", usersPage.getTotalElements(),
+                "totalPages", usersPage.getTotalPages()
+        );
+    }
+
+    @Override
     public List<UserDTO> getAllUsers() {
-        List<User> users = userRepository.findAll(); // Lấy danh sách người dùng từ repository
-        return users.stream().map(user -> {
-            UserDTO userDTO = new UserDTO();
-            userDTO.setUserId(user.getUserId());
-            userDTO.setFullName(user.getFullName());
-            userDTO.setEmail(user.getEmail());
-            userDTO.setPhone(user.getPhone());
-            return userDTO;
-        }).collect(Collectors.toList());
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> {
+                    UserDTO userDTO = Mapper.mapEntityToDto(user, UserDTO.class);
+
+                    // Chuyển đổi từ Set<Role> sang Set<String> chứa tên vai trò
+                    Set<String> roleNames = user.getRoles().stream()
+                            .map(role -> role.getRoleName())  // Lấy tên vai trò
+                            .collect(Collectors.toSet());
+
+                    userDTO.setRoles(roleNames);  // Gán danh sách tên vai trò vào DTO
+                    return userDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public Page<UserDTO> getAllUsers(Pageable pageable) {
-        return null;
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return usersPage.map(user -> Mapper.mapEntityToDto(user, UserDTO.class));
     }
 
     @Override
@@ -72,15 +98,12 @@ public class UserServiceImpl implements UserService {
             String refreshToken = jwtTokenProvider.generateRefreshToken(user.getAccount());
 
 
-
             Long expire = jwtTokenProvider.getExpirationDateFromToken(token);
 
-            // Trả về JwtResponeDTO với tất cả thông tin cần thiết
             return new JwtResponeDTO(token, refreshToken, user.getAccount(), user.getRoleNames(), expire, roles);
         } else {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_CREDENTIALS); // Ném ra ngoại lệ nếu thông tin không hợp lệ
         }
-
     }
 
     @Override
@@ -134,15 +157,65 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserProfileByAccount(String account) {
         User user = userRepository.findByAccount(account);
         if (user == null) {
-            throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND);
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
         }
         return Mapper.mapEntityToDto(user, UserDTO.class);
     }
 
-    @Override
-    public UserDTO getUserDetails(Long userId) {
-        return null;
+    private int getRoleLevelByName(String roleName) {
+        return roleRepository.findByRoleName(roleName)
+                .map(Role::getRoleLevel)
+                .orElse(0);
     }
 
+    @Override
+    public UserDTO getUserDetails(Long userId, Authentication authentication) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+
+        Optional<Integer> userRoleLevels = authentication.getAuthorities().stream()
+                .findFirst()
+                .map(authority -> authority.getAuthority())
+                .map(this::getRoleLevelByName);
+
+        int targetUserLevel = user.getHighestRoleLevel();
+
+        if (userRoleLevels.isPresent()&& userRoleLevels.get() <= targetUserLevel) {
+            return Mapper.mapEntityToDto(user, UserDTO.class);
+        }
+
+        throw new AppException(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED);
+    }
+
+
+    @Override
+    public ResponseEntity<?> addUser(UserDTO userDTO, Authentication authentication) {
+        Set<String> userRoles = authentication.getAuthorities().stream()
+                .map(authority -> authority.getAuthority())
+                .collect(Collectors.toSet());
+
+        if (!userRoles.contains("ROLE_ADMIN")) {
+            throw new AppException(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED);
+        }
+
+//        if (userDTO.getFullName() == null || userDTO.getEmail() == null ||
+//                userDTO.getPhone() == null || userDTO.getAccount() == null ||
+//                userDTO.getPassword() == null || userDTO.getRoles() == null) {
+//            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT);
+//        }
+
+        Set<Role> roles = userDTO.getRoles().stream()
+                .map(roleName -> roleRepository.findByRoleName(roleName)
+                        .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT)))
+                .collect(Collectors.toSet());
+
+        User user = Mapper.mapDtoToEntity(userDTO, User.class);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Encode password
+        user.setCreatedDate(new java.util.Date()); // Set created date
+        user.setRoles(roles); // Set roles
+
+        userRepository.save(user);
+        return ResponseEntity.ok("User created successfully");
+    }
 
 }

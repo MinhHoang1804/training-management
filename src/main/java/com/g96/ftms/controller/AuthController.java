@@ -9,9 +9,9 @@ import com.g96.ftms.dto.request.EmailRequest;
 import com.g96.ftms.dto.request.ResetPasswordRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.email.EmailService;
+import com.g96.ftms.service.user.UserService;
 import jakarta.servlet.http.HttpSession;
 import com.g96.ftms.service.auth.AuthService;
-import com.g96.ftms.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +37,18 @@ public class AuthController {
         return ResponseEntity.ok(jwtResponse);
     }
 
+    @PostMapping("/verify")
+    public ApiResponse resendVerificationEmail(@RequestBody EmailRequest emailRequest) {
+        return emailService.sendVerificationEmail(emailRequest.getEmail());
+    }
+
+
+    @PostMapping("/reset-password")
+    public ApiResponse resetPassword(@RequestBody ResetPasswordRequest request) {
+        return emailService.resetPassword(request);
+    }
+
+
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordDTO changePasswordDTO,
@@ -45,8 +57,4 @@ public class AuthController {
         return userService.changeUserPassword(changePasswordDTO, authentication);
     }
 
-
 }
-
-
-

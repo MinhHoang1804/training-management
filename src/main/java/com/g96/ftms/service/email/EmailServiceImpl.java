@@ -76,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.EMPTY_INPUT);
         }
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_MISMATCH);
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CONFIRM_PASSWORD_MISMATCH);
         }
         if (!isPasswordValid(request.getNewPassword())) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_TOO_WEAK);

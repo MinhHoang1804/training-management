@@ -1,5 +1,6 @@
 package com.g96.ftms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
@@ -10,6 +11,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.FetchType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinColumn;
@@ -42,11 +44,13 @@ public class User {
     private Long userId;
 
     @Column(name = "full_name", nullable = false)
+    @NotNull(message = "Full name is required")
     @Size(max = 255)
     private String fullName;
 
-    @Column(name = "email", unique = true)
-    @Size(max = 320)
+    @Column(name = "email", unique = true, nullable = false)
+    @NotNull(message = "Email is required")
+    @Size(max = 50)
     private String email;
 
     @Column(name = "img_ava")
@@ -54,10 +58,10 @@ public class User {
     private String imgAva = "default_avatar.png";
 
     @Column(name = "phone", nullable = false, unique = true)
+    @NotNull(message = "Phone number is required")
     @Size(max = 15)
     private String phone;
 
-    @Column(name = "emergency_phone")
     @Size(max = 15)
     private String emergencyPhone;
 
@@ -66,11 +70,13 @@ public class User {
     private String address;
 
     @Column(name = "account", nullable = false, unique = true)
+    @NotNull(message = "Account is required")
     @Size(max = 50)
     private String account;
 
     @Column(name = "password", nullable = false)
-    @Size(max = 255)
+    @NotNull(message = "Password is required")
+    @Size(max = 50)
     private String password;
 
     @Column(name = "date_of_birth")
@@ -86,11 +92,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
-
-
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
-
-
 
     @JsonProperty("role")
     public String getRole() {
@@ -100,14 +103,19 @@ public class User {
                 .orElse(null);
     }
     @JsonProperty("roleNames")
-      public String getRoleNames() {
-
+    public String getRoleNames() {
         return roles.stream()
                 .map(Role::getRoleName)
-                .collect(Collectors.toSet()).toString();
+                .collect(Collectors.joining(", "));
     }
 
 
+    public int getHighestRoleLevel() {
+        return roles.stream()
+                .mapToInt(Role::getRoleLevel)
+                .max()
+                .orElse(0);
+    }
 
 
 

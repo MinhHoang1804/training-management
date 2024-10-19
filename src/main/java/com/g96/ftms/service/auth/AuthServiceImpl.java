@@ -3,6 +3,7 @@ package com.g96.ftms.service.auth;
 
 import com.g96.ftms.dto.JwtResponeDTO;
 import com.g96.ftms.dto.LoginDTO;
+import com.g96.ftms.entity.Role;
 import com.g96.ftms.entity.User;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_CREDENTIALS);
             }
 
-            Set<String> roles = user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toSet());
+            Set<String> roles = user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet());
             String token = jwtTokenProvider.generateToken(user.getAccount(), roles);
             String refreshToken = jwtTokenProvider.generateRefreshToken();
 
