@@ -35,7 +35,7 @@ public class CurriculumServiceImpl implements CurriculumService {
                         .subjectCode(subject.getSubjectCode())
                         .subjectName(subject.getSubjectName())
                         .documentLink(subject.getDocumentLink())
-                        .weightPercentage(subject.getWeightPercentage())
+//                        .weightPercentage(subject.getWeightPercentage())
                         .createdDate(subject.getCreatedDate().toString())
                         .status(subject.isStatus())
                         .descriptions(subject.getDescriptions())

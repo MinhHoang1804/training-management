@@ -1,13 +1,13 @@
 package com.g96.ftms.service.subject;
 
 import com.g96.ftms.dto.SubjectDTO;
+import com.g96.ftms.dto.common.PagedResponse;
+import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.entity.Subject;
 
-import java.util.List;
-
-public interface SubjectService {
-    ApiResponse<List<Subject>> getAllSubjectsWithCurriculum();
+public interface ISubjectService {
+    ApiResponse<PagedResponse<Subject>> search(SubjectRequest.SubjectPagingRequest model);
 
     ApiResponse getSubjectDetail(Long subjectId);
 

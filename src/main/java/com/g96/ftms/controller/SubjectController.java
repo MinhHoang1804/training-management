@@ -1,8 +1,9 @@
 package com.g96.ftms.controller;
 
 import com.g96.ftms.dto.SubjectDTO;
+import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
-import com.g96.ftms.service.subject.SubjectService;
+import com.g96.ftms.service.subject.ISubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,18 +19,18 @@ import com.g96.ftms.entity.Subject;
 @RequestMapping("/api/v1/subject")
 public class SubjectController {
 
-    private final SubjectService subjectService;
+    private final ISubjectService subjectService;
 
     @Autowired
-    public SubjectController(SubjectService subjectService) {
+    public SubjectController(ISubjectService subjectService) {
         this.subjectService = subjectService;
     }
 
 
-    @GetMapping
-    @PreAuthorize("hasAnyRole( 'ROLE_ADMIN','ROLE_COORDINATOR','CLASS_ADMIN')")
-    public ApiResponse getSubjectList() {
-        return subjectService.getAllSubjectsWithCurriculum();
+//    @PreAuthorize("hasAnyRole( 'ROLE_ADMIN','ROLE_COORDINATOR','CLASS_ADMIN')")
+    @PostMapping("/search")
+    public ApiResponse getSubjectList(@RequestBody SubjectRequest.SubjectPagingRequest model) {
+        return subjectService.search(model);
     }
 
     @GetMapping("/detail/{id}")

@@ -39,9 +39,6 @@ public class Subject {
     private String documentLink;
 
     @Column(nullable = false)
-    private double weightPercentage;
-
-    @Column(nullable = false)
     private boolean status = true;
 
     private String descriptions;
