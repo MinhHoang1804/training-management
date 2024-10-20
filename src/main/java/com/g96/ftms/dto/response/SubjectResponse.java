@@ -1,7 +1,6 @@
 package com.g96.ftms.dto.response;
 
 import com.g96.ftms.dto.CurriculumDTO;
-import com.g96.ftms.dto.SubjectDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,17 +8,20 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class CurriculumnResponse {
-    @Data
+public class SubjectResponse {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CurriculumInfoDTO {
-        private Long curriculumId;
-        private String curriculumName;
+    @Data
+    public static class SubjectInfoDTO {
+        private Long subjectId;
+        private String subjectCode;
+        private String subjectName;
+        private String documentLink;
         private String descriptions;
+        private boolean status;
+        private double weightPercentage;
         private String createdDate;
-        private Boolean status;
-        private List<SubjectResponse.SubjectInfoDTO> subjects;
+        private List<CurriculumDTO> curriculums;
     }
 }

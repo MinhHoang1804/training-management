@@ -1,19 +1,11 @@
 package com.g96.ftms.controller;
 
-import com.g96.ftms.dto.SubjectDTO;
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.entity.Subject;
 import com.g96.ftms.service.subject.ISubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.g96.ftms.entity.Subject;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/subject")

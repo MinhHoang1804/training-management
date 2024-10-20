@@ -1,22 +1,14 @@
 package com.g96.ftms.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "subject")
@@ -49,13 +41,7 @@ public class Subject {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "curriculum_subject",
-            joinColumns = @JoinColumn(name = "subject_id"),
-            inverseJoinColumns = @JoinColumn(name = "curriculum_id")
-    )
-    private Set<Curriculum> curriculums = new HashSet<>();
-
+    @OneToMany(mappedBy = "subject",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<CurriculumSubjectRelation> curriculumSubjectRelationList;
 }

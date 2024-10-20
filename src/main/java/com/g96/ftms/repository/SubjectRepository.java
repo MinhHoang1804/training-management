@@ -11,11 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
-    @Query("SELECT s FROM Subject s JOIN s.curriculums c WHERE c.curriculumId = :curriculumId")
-    List<Subject> findByCurriculumId(@Param("curriculumId") Long curriculumId);
-
-    @Query("SELECT s FROM Subject s JOIN s.curriculums c")
-    List<Subject> findAllSubjectsWithCurriculum();
 
     @Query("SELECT s FROM Subject s WHERE " +
             "(:keywordFilter IS NULL OR (s.subjectName LIKE :keywordFilter OR s.descriptions LIKE :keywordFilter OR s.subjectCode LIKE :keywordFilter)) " +

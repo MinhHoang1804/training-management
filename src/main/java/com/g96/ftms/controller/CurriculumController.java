@@ -1,31 +1,29 @@
 package com.g96.ftms.controller;
 
+import com.g96.ftms.dto.CurriculumDTO;
 import com.g96.ftms.dto.request.CurriculumRequest;
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.CurriculumnResponse;
 import com.g96.ftms.service.curriculum.ICurriculumService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/curriculums")
 public class CurriculumController {
-
     private final ICurriculumService curriculumService;
     @PostMapping("/search")
-    public ApiResponse search(@RequestBody CurriculumRequest.CurriculumPagingRequest model) {
+    public ApiResponse<?> search(@RequestBody CurriculumRequest.CurriculumPagingRequest model) {
         return curriculumService.search(model);
     }
 
-//    @GetMapping("/detail/{curriculumId}")
-//    public ResponseEntity<CurriculumDTO> getCurriculumDetails(@PathVariable Long curriculumId) {
-//        CurriculumDTO curriculumDTO = curriculumService.getCurriculumById(curriculumId);
-//        return ResponseEntity.ok(curriculumDTO);
-//    }
+    @GetMapping("/detail/{curriculumId}")
+    public ApiResponse<?> getCurriculumDetails(@PathVariable Long curriculumId) {
+      return curriculumService.getCurriculumDetail(curriculumId);
+    }
 //
 //    // Chỉ system admin và coordinator có thể chỉnh sửa
 //    @PutMapping("/update/{curriculumId}")
