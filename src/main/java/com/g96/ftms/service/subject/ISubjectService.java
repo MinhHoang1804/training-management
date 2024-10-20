@@ -11,8 +11,8 @@ public interface ISubjectService {
 
     ApiResponse getSubjectDetail(Long subjectId);
 
-    ApiResponse<Subject> updateSubject(Long subjectId,Subject subject);
+    ApiResponse<Subject> updateSubject(SubjectRequest.SubjectEditRequest model);
 
-    ApiResponse<SubjectDTO> addSubject(SubjectDTO subjectDTO);
+    ApiResponse<Subject> addSubject(SubjectRequest.SubjectAddRequest model);
 
 }

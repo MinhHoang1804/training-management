@@ -14,6 +14,7 @@ import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.service.subject.ISubjectService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class SubjectServiceImpl implements ISubjectService {
     private final SubjectRepository subjectRepository;
 
     private final CurriculumRepository curriculumRepository;
+    private final ModelMapper mapper;
 
     @Override
     public ApiResponse<PagedResponse<Subject>> search(SubjectRequest.SubjectPagingRequest model) {
@@ -56,34 +59,34 @@ public class SubjectServiceImpl implements ISubjectService {
     }
 
     @Override
-    public ApiResponse<SubjectDTO> addSubject(SubjectDTO subjectDTO) {
-        Subject subject = new Subject();
-        BeanUtils.copyProperties(subjectDTO, subject);
-
-        Set<Curriculum> curriculums = new HashSet<>();
-        for (CurriculumDTO curriculumDTO : subjectDTO.getCurriculums()) {
-            Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getCurriculumId())
-                    .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.CURRICULUM_NOT_FOUND));
-            curriculums.add(curriculum);
+    public ApiResponse<Subject> updateSubject(SubjectRequest.SubjectEditRequest model) {
+        //check exist id
+        Subject subject = subjectRepository.findById(model.getId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        //check exist name
+//        if(subject.getSubjectName()!=model.getSubjectName()&&subjectRepository.existsBySubjectName(model.getSubjectName())){
+//            throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.DUPLICATE_SUBJECT_NAME);
+//        }
+        //check exist code
+        if(!Objects.equals(subject.getSubjectCode(), model.getSubjectCode()) && subjectRepository.existsBySubjectCode(model.getSubjectCode())){
+            throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.DUPLICATE_SUBJECT_CODE);
         }
-        subject.setCurriculums(curriculums);
 
-        Subject savedSubject = subjectRepository.save(subject);
-
-        SubjectDTO savedSubjectDTO = new SubjectDTO();
-        BeanUtils.copyProperties(savedSubject, savedSubjectDTO);
-
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), savedSubjectDTO);
+        //save data
+        Subject map = mapper.map(model, Subject.class);
+        subjectRepository.save(map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
-
 
     @Override
-    public ApiResponse<Subject> updateSubject(Long subjectId, Subject subject) {
-        if (!subjectRepository.existsById(subjectId)) {
-            throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND);
+    public ApiResponse<Subject> addSubject(SubjectRequest.SubjectAddRequest model) {
+        //check exist code
+        if(subjectRepository.existsBySubjectCode(model.getSubjectCode())){
+            throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.DUPLICATE_SUBJECT_CODE);
         }
-        subject.setSubjectId(subjectId);
-        Subject updatedSubject = subjectRepository.save(subject);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), updatedSubject);
+        Subject map = mapper.map(model, Subject.class);
+        subjectRepository.save(map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
+
 }

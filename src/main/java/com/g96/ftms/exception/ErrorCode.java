@@ -1,5 +1,6 @@
 package com.g96.ftms.exception; // Thay đổi theo cấu trúc gói của bạn
 
+import com.g96.ftms.entity.Subject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,9 +27,9 @@ public enum ErrorCode {
     EMPTY_INPUT("ERR018", "Không được để trống"),
     INVALID_EMAIL("ERR019","Email không hợp lệ" ),
     SUBJECT_NOT_FOUND("ERR020","Không tìm thấy môn học"),
-    CURRICULUM_NOT_FOUND("ERR021","Không tìm thấy Khung chương trình");
-
-
+    CURRICULUM_NOT_FOUND("ERR021","Không tìm thấy Khung chương trình"),
+    DUPLICATE_SUBJECT_NAME("ERR022","Tên môn học đã tồn tại"),
+    DUPLICATE_SUBJECT_CODE("ERR023","Mã môn học đã tồn tại");
     private final String code;
     private final String message;
 

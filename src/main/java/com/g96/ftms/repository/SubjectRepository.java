@@ -23,4 +23,8 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     Page<Subject> searchFilter(@Param("keywordFilter") String keywordFilter,
                                @Param("status") Boolean status,
                                Pageable pageable);
+
+    boolean existsBySubjectName(String subjectName);
+
+    boolean existsBySubjectCode(String subjectCode);
 }

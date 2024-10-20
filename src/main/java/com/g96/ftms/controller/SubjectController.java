@@ -39,14 +39,14 @@ public class SubjectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ApiResponse<SubjectDTO> addSubject(@RequestBody SubjectDTO subjectDTO) {
-        return subjectService.addSubject(subjectDTO);
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public ApiResponse<Subject> addSubject(@RequestBody SubjectRequest.SubjectAddRequest model) {
+        return subjectService.addSubject(model);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ApiResponse<Subject> updateSubject(@PathVariable("id") Long subjectId, @RequestBody Subject subject) {
-        return subjectService.updateSubject(subjectId, subject);
+    @PutMapping()
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public ApiResponse<Subject> updateSubject(@RequestBody SubjectRequest.SubjectEditRequest model) {
+        return subjectService.updateSubject(model);
     }
 }
