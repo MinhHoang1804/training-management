@@ -1,6 +1,5 @@
 package com.g96.ftms.dto.response;
 
-import com.g96.ftms.dto.CurriculumDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +21,6 @@ public class SubjectResponse {
         private boolean status;
         private double weightPercentage;
         private String createdDate;
-        private List<CurriculumDTO> curriculums;
+        private List<CurriculumnResponse.CurriculumInfoDTO> curriculums;
     }
 }

@@ -29,7 +29,8 @@ public enum ErrorCode {
     SUBJECT_NOT_FOUND("ERR020","Không tìm thấy môn học"),
     CURRICULUM_NOT_FOUND("ERR021","Không tìm thấy Khung chương trình"),
     DUPLICATE_SUBJECT_NAME("ERR022","Tên môn học đã tồn tại"),
-    DUPLICATE_SUBJECT_CODE("ERR023","Mã môn học đã tồn tại");
+    DUPLICATE_SUBJECT_CODE("ERR023","Mã môn học đã tồn tại"),
+    DUPLICATE_CURRICULUM_NAME("ERR024","Tên chương trình học đã tồn tại");
     private final String code;
     private final String message;
 

@@ -2,9 +2,7 @@ package com.g96.ftms.controller;
 
 import com.g96.ftms.dto.CurriculumDTO;
 import com.g96.ftms.dto.request.CurriculumRequest;
-import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
-import com.g96.ftms.dto.response.CurriculumnResponse;
 import com.g96.ftms.service.curriculum.ICurriculumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,17 +32,10 @@ public class CurriculumController {
 //        CurriculumDTO updatedCurriculum = curriculumService.updateCurriculum(curriculumDTO);
 //        return ResponseEntity.ok(updatedCurriculum);  // Trả về object đã cập nhật
 //    }
-//    @GetMapping
-//    public ResponseEntity<Map<String, Object>> getPagedCurriculums(
-//            @PageableDefault(size = 10) Pageable pageable) {
-//        Map<String, Object> response = curriculumService.getPagedCurriculums(pageable);
-//        return ResponseEntity.ok(response);
-//    }
 //
-//    @PostMapping("/create")
+    @PostMapping("/create")
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COORDINATOR')")  // Chỉ cho phép admin và coordinator tạo mới
-//    public ResponseEntity<CurriculumDTO> createCurriculum(@RequestBody CurriculumDTO curriculumDTO) {
-//        CurriculumDTO createdCurriculum = curriculumService.createCurriculum(curriculumDTO);
-//        return ResponseEntity.status(201).body(createdCurriculum);  // Trả về status 201 (Created)
-//    }
+    public ApiResponse<?> createCurriculum(@RequestBody  CurriculumRequest.CurriculumAddRequest model) {
+       return curriculumService.createCurriculum(model);
+    }
 }

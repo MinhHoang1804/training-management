@@ -1,13 +1,10 @@
 package com.g96.ftms.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CurriculumRepository extends JpaRepository<Curriculum, Long> {
+    boolean existsByCurriculumName(String curriculumName);
     @Query("SELECT c FROM Curriculum c WHERE " +
             "(:keywordFilter IS NULL OR (c.curriculumName LIKE :keywordFilter OR c.descriptions LIKE :keywordFilter)) " +
             "AND (:status IS NULL OR c.status= :status) ")

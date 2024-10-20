@@ -1,7 +1,5 @@
 package com.g96.ftms.dto.response;
 
-import com.g96.ftms.dto.CurriculumDTO;
-import com.g96.ftms.dto.SubjectDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

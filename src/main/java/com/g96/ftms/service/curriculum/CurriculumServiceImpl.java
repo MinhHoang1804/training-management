@@ -13,6 +13,7 @@ import com.g96.ftms.repository.CurriculumRepository;
 import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,35 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CurriculumServiceImpl implements ICurriculumService {
     private final CurriculumRepository curriculumRepository;
-//    @Override
-//    public CurriculumDTO getCurriculumById(Long curriculumId) {
-//        Curriculum curriculum = curriculumRepository.findById(curriculumId)
-//                .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
-//        List<SubjectDTO> subjects = subjectRepository.findByCurriculumId(curriculumId).stream()
-//                .map(subject -> SubjectDTO.builder()
-//                        .subjectId(subject.getSubjectId())
-//                        .subjectCode(subject.getSubjectCode())
-//                        .subjectName(subject.getSubjectName())
-//                        .documentLink(subject.getDocumentLink())
-////                        .weightPercentage(subject.getWeightPercentage())
-//                        .createdDate(subject.getCreatedDate().toString())
-//                        .status(subject.isStatus())
-//                        .descriptions(subject.getDescriptions())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        // Mapping từ entity sang DTO sử dụng Builder
-//        return CurriculumDTO.builder()
-//                .curriculumId(curriculum.getCurriculumId())
-//                .curriculumName(curriculum.getCurriculumName())
-//                .descriptions(curriculum.getDescriptions())
-//                .createdDate(curriculum.getCreatedDate().toString())
-//                .status(curriculum.getStatus())
-//                .subjects(subjects) // Gán danh sách Subject vào CurriculumDTO
-//                .build();
-//
-//    }
-//
+    private final ModelMapper mapper;
+
 //    @Override
 //    public CurriculumDTO  updateCurriculum(CurriculumDTO curriculumDTO) {
 //        Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getCurriculumId())
@@ -98,30 +72,6 @@ public class CurriculumServiceImpl implements ICurriculumService {
 //                "totalPages", curriculumPage.getTotalPages()
 //        );
 //    }
-//
-//    @Override
-//    public CurriculumDTO createCurriculum(CurriculumDTO curriculumDTO) {
-//        Curriculum curriculum = new Curriculum();
-//        curriculum.setCurriculumName(curriculumDTO.getCurriculumName());
-//        curriculum.setDescriptions(curriculumDTO.getDescriptions());
-//        curriculum.setStatus(curriculumDTO.getStatus());
-//        // Nếu cần, có thể thiết lập createdDate trong entity
-//
-//        // Lưu vào cơ sở dữ liệu
-//        Curriculum savedCurriculum = curriculumRepository.save(curriculum);
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        String formattedDate = curriculum.getCreatedDate().format(formatter);
-//
-//        // Chuyển đổi entity thành DTO và trả về
-//        return CurriculumDTO.builder()
-//                .curriculumId(savedCurriculum.getCurriculumId())
-//                .curriculumName(savedCurriculum.getCurriculumName())
-//                .descriptions(savedCurriculum.getDescriptions())
-//                .createdDate(formattedDate)
-//                .status(savedCurriculum.getStatus())
-//                .build();
-//    }
 
     @Override
     public ApiResponse<PagedResponse<Curriculum>> search(CurriculumRequest.CurriculumPagingRequest model) {
@@ -163,5 +113,16 @@ public class CurriculumServiceImpl implements ICurriculumService {
                 .subjects(subjectDTOs) // Add subject DTOs
                 .build();
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    @Override
+    public ApiResponse<Curriculum> createCurriculum(CurriculumRequest.CurriculumAddRequest model) {
+        // check curriculum name exist
+        if(curriculumRepository.existsByCurriculumName(model.getCurriculumName())){
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_CURRICULUM_NAME);
+        }
+        Curriculum map = mapper.map(model, Curriculum.class);
+        curriculumRepository.save(map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
 }

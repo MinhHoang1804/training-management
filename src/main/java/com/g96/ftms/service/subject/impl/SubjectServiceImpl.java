@@ -1,11 +1,9 @@
 package com.g96.ftms.service.subject.impl;
 
-import com.g96.ftms.dto.CurriculumDTO;
 import com.g96.ftms.dto.SubjectDTO;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
-import com.g96.ftms.entity.Curriculum;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
@@ -16,14 +14,11 @@ import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
