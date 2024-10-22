@@ -33,52 +33,6 @@ public class CurriculumServiceImpl implements ICurriculumService {
     private final ModelMapper mapper;
     private final SubjectRepository subjectRepository;
     private final CurriculumSubjectRepository curriculumSubjectRepository;
-//    @Override
-//    public CurriculumDTO  updateCurriculum(CurriculumDTO curriculumDTO) {
-//        Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getCurriculumId())
-//                .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
-//
-//        // Cập nhật thông tin
-//        curriculum.setCurriculumName(curriculumDTO.getCurriculumName());
-//        curriculum.setDescriptions(curriculumDTO.getDescriptions());
-//        curriculum.setStatus(curriculumDTO.getStatus());
-//
-//        // Lưu lại thay đổi
-//        curriculumRepository.save(curriculum);
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        String formattedDate = curriculum.getCreatedDate().format(formatter);
-//
-//
-//        return CurriculumDTO.builder()
-//                .curriculumId(curriculum.getCurriculumId())
-//                .curriculumName(curriculum.getCurriculumName())
-//                .descriptions(curriculum.getDescriptions())
-//                .createdDate(formattedDate) // Kiểm tra giá trị ở đây
-//                .status(curriculum.getStatus())
-//                .build();
-//
-//    }
-//    @Override
-//    public Map<String, Object> getPagedCurriculums(Pageable pageable) {
-//        Page<Curriculum> curriculumPage = curriculumRepository.findAll(pageable);
-//
-//        List<CurriculumDTO> curriculumDTOs = curriculumPage.stream()
-//                .map(curriculum -> CurriculumDTO.builder()
-//                        .curriculumId(curriculum.getCurriculumId())
-//                        .curriculumName(curriculum.getCurriculumName())
-//                        .descriptions(curriculum.getDescriptions())
-//                        .createdDate(curriculum.getCreatedDate().toString())
-//                        .status(curriculum.getStatus())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        return Map.of(
-//                "curriculums", curriculumDTOs,
-//                "currentPage", curriculumPage.getNumber(),
-//                "totalItems", curriculumPage.getTotalElements(),
-//                "totalPages", curriculumPage.getTotalPages()
-//        );
-//    }
 
     @Override
     public ApiResponse<PagedResponse<Curriculum>> search(CurriculumRequest.CurriculumPagingRequest model) {
@@ -130,20 +84,43 @@ public class CurriculumServiceImpl implements ICurriculumService {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_CURRICULUM_NAME);
         }
         //save entity
+        Curriculum curriculum = mapper.map(model, Curriculum.class);
+        curriculumRepository.save(curriculum);
+
+        //save relation
+        addBatchSubjectCurriculumRelation(curriculum, model.getSubjectList());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), curriculum);
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<Curriculum> updateCurriculum(CurriculumRequest.CurriculumEditRequest model) {
+        Curriculum curriculum = curriculumRepository.findById(model.getId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
+        // check curriculum name exist
+        if (!curriculum.getCurriculumName().equalsIgnoreCase(model.getCurriculumName())
+                && curriculumRepository.existsByCurriculumName(model.getCurriculumName())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_CURRICULUM_NAME);
+        }
+        //save entity
         Curriculum map = mapper.map(model, Curriculum.class);
         curriculumRepository.save(map);
 
+        //delete all relation
+        curriculumSubjectRepository.removeRelationByCurriculum(model.getId());
         //save relation
-        List<CurriculumRequest.CurriculumSubjectAdd> subjectList = model.getSubjectList();
+        addBatchSubjectCurriculumRelation(curriculum, model.getSubjectList());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+    }
+
+    public void addBatchSubjectCurriculumRelation(Curriculum curriculum, List<CurriculumRequest.CurriculumSubjectAdd> subjectList) {
         List<CurriculumSubjectRelation> subjectRelations = new ArrayList<>();
         for (CurriculumRequest.CurriculumSubjectAdd s : subjectList) {
             Subject subject = subjectRepository.findBySubjectCode(s.getCode());
             if (subject == null) throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SUBJECT_NOT_FOUND);
-            CurriculumSubjectRelationId id = CurriculumSubjectRelationId.builder().curriculumId(map.getCurriculumId()).subjectId(subject.getSubjectId()).build();
-            CurriculumSubjectRelation relation = CurriculumSubjectRelation.builder().subject(subject).curriculum(map).weightPercentage(s.getPercentage()).id(id).build();
+            CurriculumSubjectRelationId id = CurriculumSubjectRelationId.builder().curriculumId(curriculum.getCurriculumId()).subjectId(subject.getSubjectId()).build();
+            CurriculumSubjectRelation relation = CurriculumSubjectRelation.builder().subject(subject).curriculum(curriculum).weightPercentage(s.getPercentage()).id(id).build();
             subjectRelations.add(relation);
+            curriculumSubjectRepository.saveAll(subjectRelations);
         }
-        curriculumSubjectRepository.saveAll(subjectRelations);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
 }

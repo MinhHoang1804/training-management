@@ -28,6 +28,13 @@ public class CurriculumRequest {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class CurriculumEditRequest extends CurriculumAddRequest {
+        private Long id;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CurriculumSubjectAdd {
         private String code;
         private Double percentage;

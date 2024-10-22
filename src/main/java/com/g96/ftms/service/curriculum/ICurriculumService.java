@@ -9,7 +9,10 @@ import com.g96.ftms.entity.Curriculum;
 
 public interface ICurriculumService {
     ApiResponse<PagedResponse<Curriculum>> search(CurriculumRequest.CurriculumPagingRequest model);
+
     ApiResponse<CurriculumnResponse.CurriculumInfoDTO> getCurriculumDetail(Long curriculumId);
 
     ApiResponse<Curriculum> createCurriculum(CurriculumRequest.CurriculumAddRequest model);
+
+    ApiResponse<Curriculum> updateCurriculum(CurriculumRequest.CurriculumEditRequest model);
 }

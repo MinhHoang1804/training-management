@@ -6,6 +6,7 @@ import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.curriculum.ICurriculumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,17 +23,14 @@ public class CurriculumController {
     public ApiResponse<?> getCurriculumDetails(@PathVariable Long curriculumId) {
       return curriculumService.getCurriculumDetail(curriculumId);
     }
-//
-//    // Chỉ system admin và coordinator có thể chỉnh sửa
-//    @PutMapping("/update/{curriculumId}")
+
+    // Chỉ system admin và coordinator có thể chỉnh sửa
+    @PutMapping("/update")
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COORDINATOR')")
-//    public ResponseEntity<CurriculumDTO> updateCurriculum(
-//            @PathVariable Long curriculumId, @RequestBody CurriculumDTO curriculumDTO) {
-//        curriculumDTO.setCurriculumId(curriculumId);
-//        CurriculumDTO updatedCurriculum = curriculumService.updateCurriculum(curriculumDTO);
-//        return ResponseEntity.ok(updatedCurriculum);  // Trả về object đã cập nhật
-//    }
-//
+    public  ApiResponse<?> updateCurriculum(@RequestBody CurriculumRequest.CurriculumEditRequest model) {
+        return curriculumService.updateCurriculum(model);
+    }
+
     @PostMapping("/create")
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COORDINATOR')")  // Chỉ cho phép admin và coordinator tạo mới
     public ApiResponse<?> createCurriculum(@RequestBody  CurriculumRequest.CurriculumAddRequest model) {
