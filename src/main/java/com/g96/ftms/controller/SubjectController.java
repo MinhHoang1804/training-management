@@ -21,9 +21,15 @@ public class SubjectController {
 
 //    @PreAuthorize("hasAnyRole( 'ROLE_ADMIN','ROLE_COORDINATOR','CLASS_ADMIN')")
     @PostMapping("/search")
-    public ApiResponse getSubjectList(@RequestBody SubjectRequest.SubjectPagingRequest model) {
+    public ApiResponse<?> getSubjectList(@RequestBody SubjectRequest.SubjectPagingRequest model) {
         return subjectService.search(model);
     }
+
+    @GetMapping("/subject-options")
+    public ApiResponse<?> getAllSubjectOptions() {
+        return subjectService.getAllSubjectOption();
+    }
+
 
     @GetMapping("/detail/{id}")
     public ApiResponse getSubjectDetail(@PathVariable("id") Long subjectId) {

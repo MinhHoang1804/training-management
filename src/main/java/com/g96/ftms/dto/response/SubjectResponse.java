@@ -23,4 +23,17 @@ public class SubjectResponse {
         private String createdDate;
         private List<CurriculumnResponse.CurriculumInfoDTO> curriculums;
     }
+
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    public static class SubjectOptionDTO {
+        private Long subjectId;
+        private String subjectCode;
+        private String subjectName;
+        private String documentLink;
+        private String descriptions;
+        private boolean status;
+    }
 }

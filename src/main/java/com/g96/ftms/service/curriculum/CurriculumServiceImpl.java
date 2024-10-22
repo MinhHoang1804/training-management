@@ -6,10 +6,13 @@ import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.CurriculumnResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
 import com.g96.ftms.entity.Curriculum;
+import com.g96.ftms.entity.CurriculumSubjectRelation;
+import com.g96.ftms.entity.CurriculumSubjectRelationId;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.CurriculumRepository;
+import com.g96.ftms.repository.CurriculumSubjectRepository;
 import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +20,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CurriculumServiceImpl implements ICurriculumService {
     private final CurriculumRepository curriculumRepository;
     private final ModelMapper mapper;
-
+    private final SubjectRepository subjectRepository;
+    private final CurriculumSubjectRepository curriculumSubjectRepository;
 //    @Override
 //    public CurriculumDTO  updateCurriculum(CurriculumDTO curriculumDTO) {
 //        Curriculum curriculum = curriculumRepository.findById(curriculumDTO.getCurriculumId())
@@ -116,13 +123,27 @@ public class CurriculumServiceImpl implements ICurriculumService {
     }
 
     @Override
+    @Transactional //roll back if failed
     public ApiResponse<Curriculum> createCurriculum(CurriculumRequest.CurriculumAddRequest model) {
         // check curriculum name exist
-        if(curriculumRepository.existsByCurriculumName(model.getCurriculumName())){
+        if (curriculumRepository.existsByCurriculumName(model.getCurriculumName())) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_CURRICULUM_NAME);
         }
+        //save entity
         Curriculum map = mapper.map(model, Curriculum.class);
         curriculumRepository.save(map);
+
+        //save relation
+        List<CurriculumRequest.CurriculumSubjectAdd> subjectList = model.getSubjectList();
+        List<CurriculumSubjectRelation> subjectRelations = new ArrayList<>();
+        for (CurriculumRequest.CurriculumSubjectAdd s : subjectList) {
+            Subject subject = subjectRepository.findBySubjectCode(s.getCode());
+            if (subject == null) throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SUBJECT_NOT_FOUND);
+            CurriculumSubjectRelationId id = CurriculumSubjectRelationId.builder().curriculumId(map.getCurriculumId()).subjectId(subject.getSubjectId()).build();
+            CurriculumSubjectRelation relation = CurriculumSubjectRelation.builder().subject(subject).curriculum(map).weightPercentage(s.getPercentage()).id(id).build();
+            subjectRelations.add(relation);
+        }
+        curriculumSubjectRepository.saveAll(subjectRelations);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
 }

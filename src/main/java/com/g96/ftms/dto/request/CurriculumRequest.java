@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class CurriculumRequest {
     @Data
     @AllArgsConstructor
@@ -21,5 +23,13 @@ public class CurriculumRequest {
         private String curriculumName;
         private String descriptions;
         private Boolean status = true;
+        List<CurriculumSubjectAdd>subjectList;
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CurriculumSubjectAdd {
+        private String code;
+        private Double percentage;
     }
 }

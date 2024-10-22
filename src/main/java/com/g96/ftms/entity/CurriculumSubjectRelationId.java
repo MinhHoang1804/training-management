@@ -2,19 +2,19 @@ package com.g96.ftms.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 @Data
 @EqualsAndHashCode
 @Embeddable
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class CurriculumSubjectRelationId implements Serializable {
     @Column(name = "curriculum_id")
-    private Integer curriculumId;
+    private Long curriculumId;
 
     @Column(name = "subject_id")
-    private Integer subjectId;
+    private Long subjectId;
 }

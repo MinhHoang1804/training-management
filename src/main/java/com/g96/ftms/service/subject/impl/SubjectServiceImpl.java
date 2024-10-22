@@ -4,6 +4,7 @@ import com.g96.ftms.dto.SubjectDTO;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.SubjectResponse;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
@@ -13,11 +14,13 @@ import com.g96.ftms.service.subject.ISubjectService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -82,6 +85,14 @@ public class SubjectServiceImpl implements ISubjectService {
         Subject map = mapper.map(model, Subject.class);
         subjectRepository.save(map);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+    }
+
+    @Override
+    public ApiResponse<List<SubjectResponse.SubjectOptionDTO>> getAllSubjectOption() {
+        List<Subject> list = subjectRepository.findByStatusTrue();
+        List<SubjectResponse.SubjectOptionDTO> response=mapper.map(list, new TypeToken<List<SubjectResponse.SubjectOptionDTO>>() {
+        }.getType());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
 }
