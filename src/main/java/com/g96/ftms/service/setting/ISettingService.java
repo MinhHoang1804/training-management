@@ -12,4 +12,5 @@ public interface ISettingService {
     ApiResponse<Settings> createSetting(SettingRequest.SettingAddRequest model);
 
     ApiResponse<Settings> updateSetting(SettingRequest.SettingEditRequest model);
+    ApiResponse<SettingResponse.SettingInfoDTO> getDetail(Long id);
 }

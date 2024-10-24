@@ -41,28 +41,8 @@ public class SettingServiceImpl implements ISettingService {
 
         // Duyệt qua các settings và lấy dữ liệu từ Room và Generation
         for (Settings setting : pages) {
-            if (setting.getRoom() != null) {
-                SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
-                dto.setId(setting.getSettingId());
-                dto.setSettingName(setting.getRoom().getRoomName());
-                dto.setSettingGroup(SettingGroupEnum.ROOM.name());
-                dto.setDescription(setting.getDescription());
-                dto.setStatus(setting.getStatus());
-                settingInfoList.add(dto);
-            }
-
-
-            // Duyệt qua các Generation
-            if (setting.getGeneration() != null) {
-                SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
-                dto.setId(setting.getSettingId());
-                dto.setSettingName(setting.getGeneration().getGenerationName());
-                dto.setSettingGroup(SettingGroupEnum.GENERATION.name());
-                dto.setDescription(setting.getDescription());
-                dto.setStatus(setting.getStatus());
-                settingInfoList.add(dto);
-            }
-
+            SettingResponse.SettingInfoDTO settingInfoDTO = convertSettingToInfoDto(setting);
+            settingInfoList.add(settingInfoDTO);
         }
         PagedResponse<SettingResponse.SettingInfoDTO> response = new PagedResponse<>(settingInfoList, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
@@ -75,8 +55,8 @@ public class SettingServiceImpl implements ISettingService {
         //create setting generation with group required match type
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
 
-            if(!generationRepository.existsByGenerationName(model.getSettingName())){
-               throw  new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
+            if (!generationRepository.existsByGenerationName(model.getSettingName())) {
+                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
             }
             Generation generation = Generation.builder().generationName(model.getSettingName()
             ).build();
@@ -90,19 +70,19 @@ public class SettingServiceImpl implements ISettingService {
             setting.setRoom(room);
             settingsRepository.save(setting);
         }
-        return  new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
     }
 
     @Override
     public ApiResponse<Settings> updateSetting(SettingRequest.SettingEditRequest model) {
         Settings setting = settingsRepository.findById(model.getId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SETTING_NOTFOUND));
-        if(model.getStatus()!=null){
+        if (model.getStatus() != null) {
             setting.setStatus(model.getStatus());
         }
         setting.setDescription(model.getDescription());
         //reset group;
-            setting.setRoom(null);
-        if (setting.getGeneration()!=null){
+        setting.setRoom(null);
+        if (setting.getGeneration() != null) {
             setting.setGeneration(null);
             settingsRepository.save(setting); //remove generation
             generationRepository.delete(setting.getGeneration()); //delete generation
@@ -111,8 +91,8 @@ public class SettingServiceImpl implements ISettingService {
 
         //update group
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
-            if(!generationRepository.existsByGenerationName(model.getSettingName())){
-                throw  new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
+            if (!generationRepository.existsByGenerationName(model.getSettingName())) {
+                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
             }
             Generation generation = Generation.builder().generationName(model.getSettingName()
             ).build();
@@ -127,5 +107,37 @@ public class SettingServiceImpl implements ISettingService {
             settingsRepository.save(setting);
         }
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
+    }
+
+    @Override
+    public ApiResponse<SettingResponse.SettingInfoDTO> getDetail(Long id) {
+        Settings setting = settingsRepository.findById(id).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SETTING_NOTFOUND));
+        SettingResponse.SettingInfoDTO response = convertSettingToInfoDto(setting);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+    public SettingResponse.SettingInfoDTO convertSettingToInfoDto(Settings setting) {
+        // Duyệt qua các settings và lấy dữ liệu từ Room và Generation
+        if (setting.getRoom() != null) {
+            SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
+            dto.setId(setting.getSettingId());
+            dto.setSettingName(setting.getRoom().getRoomName());
+            dto.setSettingGroup(SettingGroupEnum.ROOM.name());
+            dto.setDescription(setting.getDescription());
+            dto.setStatus(setting.getStatus());
+            return dto;
+        }
+
+
+        // Duyệt qua các Generation
+        if (setting.getGeneration() != null) {
+            SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
+            dto.setId(setting.getSettingId());
+            dto.setSettingName(setting.getGeneration().getGenerationName());
+            dto.setSettingGroup(SettingGroupEnum.GENERATION.name());
+            dto.setDescription(setting.getDescription());
+            dto.setStatus(setting.getStatus());
+            return dto;
+        }
+        return null;
     }
 }

@@ -26,4 +26,8 @@ public class SettingController {
     public ApiResponse<?> updateSetting(@RequestBody SettingRequest.SettingEditRequest model) {
         return settingService.updateSetting(model);
     }
+    @GetMapping("/detail/{id}")
+    public ApiResponse<?> updateSetting(@PathVariable("id") Long id) {
+        return settingService.getDetail(id);
+    }
 }
