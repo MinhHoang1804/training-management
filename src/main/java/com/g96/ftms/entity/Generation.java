@@ -4,14 +4,19 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "generation")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Generation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +27,7 @@ public class Generation {
     @NotNull
     private String generationName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "setting_id")
+    @OneToMany(mappedBy = "generation", fetch = FetchType.LAZY)
     @JsonBackReference
-    private Settings settings;
+    private List<Settings> generations = new ArrayList<>();
 }

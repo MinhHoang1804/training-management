@@ -4,14 +4,19 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "room")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +26,8 @@ public class Room {
     @Column(name = "room_name")
     private String roomName;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "setting_id")
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     @JsonBackReference
-    private Settings settings;
+    private List<Settings> settings = new ArrayList<>();
 
 }

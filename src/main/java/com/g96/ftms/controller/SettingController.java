@@ -20,4 +20,8 @@ public class SettingController {
     public ApiResponse<?> search(@RequestBody SettingRequest.SettingPagingRequest model) {
         return settingService.search(model);
     }
+    @PostMapping("/create")
+    public ApiResponse<?> createSetting(@RequestBody SettingRequest.SettingAddRequest model) {
+        return settingService.createSetting(model);
+    }
 }

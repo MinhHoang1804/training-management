@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SettingsRepository extends JpaRepository<Settings, Long> {
     @Query("SELECT s FROM Settings s " +
-            "LEFT JOIN s.rooms r " +
-            "LEFT JOIN s.generations g " +
+            "LEFT JOIN s.room r " +
+            "LEFT JOIN s.generation g " +
             "WHERE (:keyword IS NULL OR s.description LIKE %:keyword% " +
             "OR r.roomName LIKE %:keyword% " +
             "OR g.generationName LIKE %:keyword%) " +

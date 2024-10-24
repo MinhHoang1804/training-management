@@ -31,15 +31,17 @@ public class Settings {
     @Column(name = "status")
     private Boolean status;
 
-    @OneToMany(mappedBy = "settings", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
     @JsonBackReference
-    private List<Room> rooms = new ArrayList<>();
+    private Room room;
 
-    @OneToMany(mappedBy = "settings", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "generation_id")
     @JsonBackReference
-    private List<Generation> generations = new ArrayList<>();
+    private Generation generation;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }
