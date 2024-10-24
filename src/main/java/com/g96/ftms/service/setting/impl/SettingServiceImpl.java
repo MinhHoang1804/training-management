@@ -43,6 +43,7 @@ public class SettingServiceImpl implements ISettingService {
         for (Settings setting : pages) {
             if (setting.getRoom() != null) {
                 SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
+                dto.setId(setting.getSettingId());
                 dto.setSettingName(setting.getRoom().getRoomName());
                 dto.setSettingGroup(SettingGroupEnum.ROOM.name());
                 dto.setDescription(setting.getDescription());
@@ -54,6 +55,7 @@ public class SettingServiceImpl implements ISettingService {
             // Duyệt qua các Generation
             if (setting.getGeneration() != null) {
                 SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
+                dto.setId(setting.getSettingId());
                 dto.setSettingName(setting.getGeneration().getGenerationName());
                 dto.setSettingGroup(SettingGroupEnum.GENERATION.name());
                 dto.setDescription(setting.getDescription());
@@ -89,5 +91,41 @@ public class SettingServiceImpl implements ISettingService {
             settingsRepository.save(setting);
         }
         return  new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
+    }
+
+    @Override
+    public ApiResponse<Settings> updateSetting(SettingRequest.SettingEditRequest model) {
+        Settings setting = settingsRepository.findById(model.getId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SETTING_NOTFOUND));
+        if(model.getStatus()!=null){
+            setting.setStatus(model.getStatus());
+        }
+        setting.setDescription(model.getDescription());
+        //reset group;
+            setting.setRoom(null);
+        if (setting.getGeneration()!=null){
+            setting.setGeneration(null);
+            settingsRepository.save(setting); //remove generation
+            generationRepository.delete(setting.getGeneration()); //delete generation
+        }
+        settingsRepository.save(setting);
+
+        //update group
+        if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
+            if(!generationRepository.existsByGenerationName(model.getSettingName())){
+                throw  new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
+            }
+            Generation generation = Generation.builder().generationName(model.getSettingName()
+            ).build();
+            generationRepository.save(generation);
+            setting.setGeneration(generation);
+            settingsRepository.save(setting);
+        }
+        //save setting room
+        if (model.getSettingGroup() == SettingGroupEnum.ROOM) {
+            Room room = roomRepository.findByRoomName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
+            setting.setRoom(room);
+            settingsRepository.save(setting);
+        }
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
     }
 }

@@ -26,4 +26,10 @@ public class SettingRequest {
         private String description;
         private Boolean status;
     }
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SettingEditRequest extends SettingAddRequest{
+        private Long id; //setting id
+    }
 }

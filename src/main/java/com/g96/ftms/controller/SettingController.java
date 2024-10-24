@@ -4,10 +4,7 @@ import com.g96.ftms.dto.request.SettingRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.setting.ISettingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +20,10 @@ public class SettingController {
     @PostMapping("/create")
     public ApiResponse<?> createSetting(@RequestBody SettingRequest.SettingAddRequest model) {
         return settingService.createSetting(model);
+    }
+
+    @PutMapping("/save")
+    public ApiResponse<?> updateSetting(@RequestBody SettingRequest.SettingEditRequest model) {
+        return settingService.updateSetting(model);
     }
 }

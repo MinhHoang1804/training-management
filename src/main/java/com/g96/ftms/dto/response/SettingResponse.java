@@ -10,6 +10,7 @@ public class SettingResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SettingInfoDTO {
+        private Long id;
         private String settingName;
         private String settingGroup;
         private String description;
