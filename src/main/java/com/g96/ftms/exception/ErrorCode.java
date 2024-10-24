@@ -31,7 +31,8 @@ public enum ErrorCode {
     DUPLICATE_SUBJECT_NAME("ERR022","Tên môn học đã tồn tại"),
     DUPLICATE_SUBJECT_CODE("ERR023","Mã môn học đã tồn tại"),
     DUPLICATE_CURRICULUM_NAME("ERR024","Tên chương trình học đã tồn tại"),
-    ROOM_NOT_FOUND("ERR024","Không tìm thấy tên phòng");
+    ROOM_NOT_FOUND("ERR025","Không tìm thấy tên phòng"),
+    GENERATION_NAME_SETTING_EXIST("ERR026","Setting cho generation này đã tồn tại");
     private final String code;
     private final String message;
 

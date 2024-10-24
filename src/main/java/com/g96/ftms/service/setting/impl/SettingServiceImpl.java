@@ -72,6 +72,10 @@ public class SettingServiceImpl implements ISettingService {
         Settings setting = mapper.map(model, Settings.class);
         //create setting generation with group required match type
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
+
+            if(!generationRepository.existsByGenerationName(model.getSettingName())){
+               throw  new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
+            }
             Generation generation = Generation.builder().generationName(model.getSettingName()
             ).build();
             generationRepository.save(generation);
