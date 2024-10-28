@@ -22,4 +22,6 @@ public interface SettingsRepository extends JpaRepository<Settings, Long> {
             @Param("status") Boolean status,
             Pageable pageable
     );
+
+    Settings findByDescription(String description);
 }

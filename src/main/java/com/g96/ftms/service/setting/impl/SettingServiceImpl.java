@@ -52,21 +52,23 @@ public class SettingServiceImpl implements ISettingService {
     @Transactional
     public ApiResponse<Settings> createSetting(SettingRequest.SettingAddRequest model) {
         Settings setting = mapper.map(model, Settings.class);
+        Settings byDescription = settingsRepository.findByDescription(model.getDescription());
         //create setting generation with group required match type
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
-
-            if (!generationRepository.existsByGenerationName(model.getSettingName())) {
-                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
-            }
-            Generation generation = Generation.builder().generationName(model.getSettingName()
-            ).build();
-            generationRepository.save(generation);
+            Generation generation = generationRepository.findByGenerationName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
             setting.setGeneration(generation);
+            //check desc exist
+            if(byDescription!=null&&byDescription.getGeneration()!=null){
+                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
+            }
             settingsRepository.save(setting);
         }
         //create setting room
         if (model.getSettingGroup() == SettingGroupEnum.ROOM) {
             Room room = roomRepository.findByRoomName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
+            if(byDescription!=null&&byDescription.getRoom()!=null){
+                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
+            }
             setting.setRoom(room);
             settingsRepository.save(setting);
         }
