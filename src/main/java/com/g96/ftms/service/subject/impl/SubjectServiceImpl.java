@@ -90,6 +90,7 @@ public class SubjectServiceImpl implements ISubjectService {
 
         //save data
         Subject map = mapper.map(model, Subject.class);
+        map.setSubjectId(model.getId());
         map.setMarkSchemeList(schemeListSaved);
         subjectRepository.save(map);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
