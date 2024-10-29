@@ -21,7 +21,7 @@ public class SubjectResponse {
         private boolean status;
         private double weightPercentage;
         private String createdDate;
-        private List<CurriculumnResponse.CurriculumInfoDTO> curriculums;
+        private List<SchemeResponse.SubjectSchemeInfo> schemes;
     }
 
     @Builder

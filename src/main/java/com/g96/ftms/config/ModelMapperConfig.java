@@ -15,9 +15,6 @@ public class ModelMapperConfig {
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT);
 
-        modelMapper.typeMap(SubjectResponse.SubjectInfoDTO.class, SubjectResponse.SubjectInfoDTO.class).addMappings(mapper ->
-                mapper.skip(SubjectResponse.SubjectInfoDTO::setCurriculums)
-        );
         return modelMapper;
     }
 }

@@ -21,6 +21,7 @@ public class Subject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "subject_id")
     private Long subjectId;
 
     @Column(nullable = false)
@@ -46,4 +47,9 @@ public class Subject {
     @OneToMany(mappedBy = "subject",fetch = FetchType.LAZY)
     @JsonBackReference
     List<CurriculumSubjectRelation> curriculumSubjectRelationList;
+
+    @OneToMany(mappedBy = "subject",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<MarkScheme> markSchemeList;
+
 }

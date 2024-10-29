@@ -1,6 +1,5 @@
 package com.g96.ftms.service.curriculum;
 
-import com.g96.ftms.dto.CurriculumDTO;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.CurriculumRequest;
 import com.g96.ftms.dto.response.ApiResponse;

@@ -11,7 +11,7 @@ import java.util.List;
 public interface ISubjectService {
     ApiResponse<PagedResponse<Subject>> search(SubjectRequest.SubjectPagingRequest model);
 
-    ApiResponse getSubjectDetail(Long subjectId);
+    ApiResponse<SubjectResponse.SubjectInfoDTO> getSubjectDetail(Long subjectId);
 
     ApiResponse<Subject> updateSubject(SubjectRequest.SubjectEditRequest model);
 

@@ -1,12 +1,9 @@
 package com.g96.ftms.controller;
 
-import com.g96.ftms.dto.CurriculumDTO;
 import com.g96.ftms.dto.request.CurriculumRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.curriculum.ICurriculumService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
