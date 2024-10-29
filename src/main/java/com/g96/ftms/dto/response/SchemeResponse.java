@@ -7,6 +7,7 @@ public class SchemeResponse {
     @Data
     @NoArgsConstructor
     public static class SubjectSchemeInfo {
+        private Integer markSchemeId;
         private String markName;
         private Double markWeight;
     }

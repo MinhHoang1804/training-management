@@ -15,6 +15,7 @@ import com.g96.ftms.repository.SchemeRepository;
 import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.service.subject.ISubjectService;
 import com.g96.ftms.util.SqlBuilderUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -63,26 +64,39 @@ public class SubjectServiceImpl implements ISubjectService {
     }
 
     @Override
+    @Transactional
     public ApiResponse<Subject> updateSubject(SubjectRequest.SubjectEditRequest model) {
         //check exist id
         Subject subject = subjectRepository.findById(model.getId()).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
-        //check exist name
-//        if(subject.getSubjectName()!=model.getSubjectName()&&subjectRepository.existsBySubjectName(model.getSubjectName())){
-//            throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.DUPLICATE_SUBJECT_NAME);
-//        }
+
         //check exist code
         if (!Objects.equals(subject.getSubjectCode(), model.getSubjectCode()) && subjectRepository.existsBySubjectCode(model.getSubjectCode())) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SUBJECT_CODE);
         }
+        //delete all relation
+        schemeRepository.deleteBySubject_SubjectId(subject.getSubjectId());
+
+        // set new scheme
+        List<SchemeResponse.SubjectSchemeInfo> schemes = model.getSchemes();
+        List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
+            MarkScheme scheme = mapper.map(s, MarkScheme.class);
+            scheme.setStatus(true);
+            scheme.setSubject(subject);
+            return scheme;
+        }).toList();
+        //save scheme
+        List<MarkScheme> schemeListSaved = schemeRepository.saveAll(schemeList);
 
         //save data
         Subject map = mapper.map(model, Subject.class);
+        map.setMarkSchemeList(schemeListSaved);
         subjectRepository.save(map);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
 
     @Override
+    @Transactional
     public ApiResponse<Subject> addSubject(SubjectRequest.SubjectAddRequest model) {
         //check exist code
         if (subjectRepository.existsBySubjectCode(model.getSubjectCode())) {

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SchemeRepository  extends JpaRepository<MarkScheme, Long> {
+    long deleteBySubject_SubjectId(Long subjectId);
 }
