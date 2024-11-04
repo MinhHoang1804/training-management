@@ -12,4 +12,6 @@ public interface IClassService {
 
     ApiResponse<ClassReponse.ClassInforDTO> getClassDetail(Long classId);
 
+    ApiResponse<?> addClass(ClassRequest.ClassAddRequest model);
+
 }

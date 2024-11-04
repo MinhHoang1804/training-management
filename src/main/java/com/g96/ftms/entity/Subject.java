@@ -52,4 +52,8 @@ public class Subject {
     @JsonBackReference
     List<MarkScheme> markSchemeList;
 
+    @OneToMany(mappedBy = "subject",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<Schedule> schedules;
+
 }

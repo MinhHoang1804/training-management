@@ -30,4 +30,7 @@ public class Room {
     @JsonBackReference
     private List<Settings> settings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @JsonBackReference
+    private List<Schedule> schedules = new ArrayList<>();
 }

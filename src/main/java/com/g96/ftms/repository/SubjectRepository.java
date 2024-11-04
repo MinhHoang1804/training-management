@@ -26,4 +26,6 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     Subject findBySubjectCode(String subjectCode);
 
     List<Subject> findByStatusTrue();
+
+    List<Subject> findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(Long curriculumId);
 }

@@ -1,5 +1,6 @@
 package com.g96.ftms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "class")
@@ -41,8 +43,8 @@ public class Class {
     @Column
     private LocalDateTime startDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<Schedule> schedules;
 }
 

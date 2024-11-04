@@ -18,8 +18,8 @@ public class ClassReponse {
         private String descriptions;
         private Boolean status;
         private String admin;
-        private LocalDateTime endDate = LocalDateTime.now();
-        private LocalDateTime startDate = LocalDateTime.now();
-        private LocalDateTime createdDate = LocalDateTime.now();
+        private LocalDateTime endDate ;
+        private LocalDateTime startDate;
+        private LocalDateTime createdDate;
     }
 }
