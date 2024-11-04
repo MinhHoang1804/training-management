@@ -1,6 +1,6 @@
 package com.g96.ftms.dto.response;
 
-import com.g96.ftms.dto.common.PagingBaseParams;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class ClassReponse {
     @Data
     @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
     public static class ClassInforDTO {
         private Long classId;
