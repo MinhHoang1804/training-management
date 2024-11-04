@@ -35,7 +35,8 @@ public enum ErrorCode {
     GENERATION_NAME_SETTING_EXIST("ERR026","Setting cho generation này đã tồn tại"),
     SETTING_NOTFOUND("ERR027","Không tìm thấy setting"),
     GENERATION_NOT_FOUND("ERR028","Generation này không tồn tại"),
-    DUPLICATE_SETTING("ERR028","Setting đã tồn tại");
+    DUPLICATE_SETTING("ERR029","Setting đã tồn tại"),
+    CLASS_NOT_FOUND("ERR030","Không tìm thấy lớp học");
     private final String code;
     private final String message;
 

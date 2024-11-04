@@ -5,6 +5,8 @@ import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.ClassReponse;
 import com.g96.ftms.entity.Class;
+import com.g96.ftms.entity.Subject;
+import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.ClassRepository;
 import com.g96.ftms.service.classes.IClassService;
@@ -12,6 +14,7 @@ import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +35,19 @@ public class ClassServiceImpl implements IClassService {
             return result;
         }).collect(Collectors.toList());
         PagedResponse<ClassReponse.ClassInforDTO> response = new PagedResponse<>(collect, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    @Override
+    public ApiResponse<ClassReponse.ClassInforDTO> getClassDetail(Long classId) {
+        if (classId == null || classId <= 0) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT);
+        }
+
+        Class c= classRepository.findById(classId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
+        response.setAdmin(c.getUser().getAccount());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 }
