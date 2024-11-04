@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClassRepository  extends JpaRepository<Class, Long> {
     @Query("SELECT c FROM Class c WHERE " +
-            "(:keywordFilter IS NULL OR (c.classCode LIKE :keywordFilter OR c.descriptions LIKE :keywordFilter OR c.user.account LIKE :keywordFilter)) " +
+            "(:keywordFilter IS NULL OR (c.classCode LIKE :keywordFilter OR c.descriptions LIKE :keywordFilter)) " +
             "AND (:status IS NULL OR c.status= :status) ")
     Page<Class> searchFilter(@Param("keywordFilter") String keywordFilter,
                                   @Param("status") Boolean status,

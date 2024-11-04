@@ -29,9 +29,7 @@ public class ClassServiceImpl implements IClassService {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
         Page<Class> pages = classRepository.searchFilter(keywordFilter, model.getStatus(), model.getPageable());
         List<ClassReponse.ClassInforDTO> collect = pages.getContent().stream().map(s -> {
-            ClassReponse.ClassInforDTO result = mapper.map(s, ClassReponse.ClassInforDTO.class);
-            result.setAdmin(s.getUser().getAccount());
-            return result;
+            return mapper.map(s, ClassReponse.ClassInforDTO.class);
         }).collect(Collectors.toList());
         PagedResponse<ClassReponse.ClassInforDTO> response = new PagedResponse<>(collect, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
@@ -46,7 +44,6 @@ public class ClassServiceImpl implements IClassService {
         Class c= classRepository.findById(classId).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
-        response.setAdmin(c.getUser().getAccount());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 }

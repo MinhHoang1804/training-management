@@ -21,23 +21,25 @@ public class Class {
     @Column(name = "class_id")
     private Long classId;
 
-    @Column(nullable = false)
+    @Column(name = "class_code")
     private String classCode;
 
-
-    @Column(nullable = false)
+    @Column
     private boolean status = true;
 
     private String descriptions;
 
-    @Column(nullable = false, updatable = false)
+    @Column
+    private String admin;
+
+    @Column(updatable = false)
     private LocalDateTime createdDate = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private LocalDateTime endDate = LocalDateTime.now();
+    @Column
+    private LocalDateTime endDate;
 
-    @Column(nullable = false)
-    private LocalDateTime startDate = LocalDateTime.now();
+    @Column
+    private LocalDateTime startDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
