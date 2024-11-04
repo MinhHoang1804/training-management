@@ -5,7 +5,6 @@ import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.ClassReponse;
 import com.g96.ftms.entity.Class;
-import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.ClassRepository;

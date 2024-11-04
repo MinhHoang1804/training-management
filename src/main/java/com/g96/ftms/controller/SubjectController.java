@@ -32,7 +32,7 @@ public class SubjectController {
 
 
     @GetMapping("/detail/{id}")
-    public ApiResponse getSubjectDetail(@PathVariable("id") Long subjectId) {
+    public ApiResponse<?> getSubjectDetail(@PathVariable("id") Long subjectId) {
         return subjectService.getSubjectDetail(subjectId);
     }
 

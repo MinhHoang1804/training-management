@@ -9,6 +9,7 @@ import com.g96.ftms.entity.Subject;
 
 public interface IClassService {
     ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model);
+
     ApiResponse<ClassReponse.ClassInforDTO> getClassDetail(Long classId);
 
 }

@@ -4,10 +4,7 @@ import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.classes.IClassService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/grade-management")
@@ -18,5 +15,9 @@ public class ClassController {
     @GetMapping("/search")
     public ApiResponse<?> getClassList(@RequestBody ClassRequest.ClassPagingRequest model) {
         return classService.search(model);
+    }
+    @GetMapping("/detail/{id}")
+    public ApiResponse<?> getClass(@PathVariable("id") Long classId) {
+        return classService.getClassDetail(classId);
     }
 }
