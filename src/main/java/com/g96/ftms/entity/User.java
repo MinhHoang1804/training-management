@@ -115,6 +115,6 @@ public class User {
                 .orElse(0);
     }
 
-
-
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Grade> grades;
 }
