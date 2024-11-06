@@ -46,5 +46,9 @@ public class Class {
     @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
     @JsonBackReference
     List<Schedule> schedules;
+
+    @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<UserClassRelation> userClassRelationList;
 }
 

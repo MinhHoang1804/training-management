@@ -77,6 +77,10 @@ public class User {
     @Column(name = "created_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private java.util.Date createdDate;
 
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<UserClassRelation> userClassRelationList;
+
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
