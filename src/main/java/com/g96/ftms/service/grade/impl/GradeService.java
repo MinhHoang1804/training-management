@@ -85,8 +85,8 @@ public class GradeService implements IGradeService {
                 .map(entry -> new GradeResponse.GradeComponent(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        // Tính tổng điểm của người dùng này qua tất cả các môn học
-        double total = subjectTotals.values().stream().mapToDouble(Double::doubleValue).sum();
+        // Tính tổng điểm trung bình của người dùng này qua tất cả các môn học
+        double total = subjectTotals.values().stream().mapToDouble(Double::doubleValue).sum()/subjectTotals.size();
 
         // Trả về đối tượng GradeInfoDTO chứa thông tin của người dùng và danh sách điểm theo môn học
         return GradeResponse.GradeInfoDTO.builder()
