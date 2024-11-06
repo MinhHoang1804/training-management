@@ -22,4 +22,14 @@ public class ClassReponse {
         private LocalDateTime startDate;
         private LocalDateTime createdDate;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class GradeTableInforDTO {
+    private String id;
+    private String subjectName;
+    private String grade;
+    }
 }

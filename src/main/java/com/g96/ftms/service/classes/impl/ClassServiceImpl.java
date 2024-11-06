@@ -57,6 +57,11 @@ public class ClassServiceImpl implements IClassService {
     }
 
     @Override
+    public ApiResponse<ClassReponse.ClassInforDTO> getClassForTrainee(Long classId) {
+        return null;
+    }
+
+    @Override
     @Transactional
     public ApiResponse<?> addClass(ClassRequest.ClassAddRequest model) {
 

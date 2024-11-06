@@ -20,6 +20,10 @@ public class ClassController {
     public ApiResponse<?> getClass(@PathVariable("id") Long classId) {
         return classService.getClassDetail(classId);
     }
+    @PostMapping("/info-trainee/{id}")
+    public ApiResponse<?> getInfoForTrainee(@PathVariable("id") Long classId) {
+        return classService.getClassForTrainee(classId);
+    }
 
     @PostMapping("/add")
     public ApiResponse<?> addClass(@RequestBody ClassRequest.ClassAddRequest model) {

@@ -11,6 +11,7 @@ public interface IClassService {
     ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model);
 
     ApiResponse<ClassReponse.ClassInforDTO> getClassDetail(Long classId);
+    ApiResponse<ClassReponse.ClassInforDTO> getClassForTrainee(Long classId);
 
     ApiResponse<?> addClass(ClassRequest.ClassAddRequest model);
 
