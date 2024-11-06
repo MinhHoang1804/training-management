@@ -4,11 +4,13 @@ import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.GradeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.GradeResponse;
+import com.g96.ftms.entity.Class;
 import com.g96.ftms.entity.Grade;
-import com.g96.ftms.entity.Subject;
+import com.g96.ftms.entity.GradeSetting;
 import com.g96.ftms.entity.User;
-import com.g96.ftms.entity.UserClassRelation;
+import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
+import com.g96.ftms.repository.ClassRepository;
 import com.g96.ftms.repository.GradeRepository;
 import com.g96.ftms.repository.UserClassRelationRepository;
 import com.g96.ftms.repository.UserRepository;
@@ -16,7 +18,7 @@ import com.g96.ftms.service.grade.IGradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +32,8 @@ public class GradeService implements IGradeService {
     private final UserClassRelationRepository userClassRelationRepository;
     private final GradeRepository gradeRepository;
     private final UserRepository userRepository;
+    private final ClassRepository classRepository;
+
     @Override
     public ApiResponse<PagedResponse<GradeResponse.GradeInfoDTO>> search(GradeRequest.GradePagingRequest model) {
         List<GradeResponse.GradeInfoDTO> list = new ArrayList<>();
@@ -59,6 +63,26 @@ public class GradeService implements IGradeService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
+    @Override
+    public ApiResponse<GradeResponse.GradeInfoDTO> getGradeDetail(GradeRequest.GradedDetailRequest model) {
+        Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        List<GradeSetting> gradeSettingList = c.getGradeSettingList();
+        //get grade infor
+        GradeResponse.GradeInfoDTO gradesByUserId = getGradesByUserId(model.getUserId(), model.getClassId());
+        //update grade weight
+        List<GradeResponse.GradeComponent> newComponentGrades = gradesByUserId.getGradeComponentList().stream().peek(item->{
+            for (GradeSetting gradeSetting:gradeSettingList){
+                if(gradeSetting.getSubject().getSubjectName().equalsIgnoreCase(item.getSubjectName())){
+                    item.setWeight(gradeSetting.getMarkScheme().getMarkWeight());
+                }
+            }
+        }).toList();
+
+        gradesByUserId.setGradeComponentList(newComponentGrades);
+
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), gradesByUserId);
+    }
 
 
     // Service để lấy điểm của một người dùng

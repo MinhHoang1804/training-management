@@ -12,4 +12,10 @@ public class GradeRequest {
         private Boolean status;
         private Long classId;
     }
+    @Data
+    @NoArgsConstructor
+    public static class GradedDetailRequest {
+        private Long userId;
+        private Long classId;
+    }
 }

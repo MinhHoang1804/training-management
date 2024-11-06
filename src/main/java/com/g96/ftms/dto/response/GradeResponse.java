@@ -23,7 +23,14 @@ public class GradeResponse {
     @AllArgsConstructor
     @Data
     public static class GradeComponent {
-        private String name;
+        private String subjectName;
         private Double grade;
+        public GradeComponent(String subjectName, Double grade) {
+            this.subjectName = subjectName;
+            this.grade = grade;
+        }
+        private Double weight;
     }
+
+
 }

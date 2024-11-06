@@ -10,4 +10,5 @@ import java.util.List;
 public interface IGradeService {
     ApiResponse<PagedResponse<GradeResponse.GradeInfoDTO>> search(GradeRequest.GradePagingRequest model);
 
+    ApiResponse<GradeResponse.GradeInfoDTO> getGradeDetail(GradeRequest.GradedDetailRequest model);
 }
