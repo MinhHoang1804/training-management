@@ -3,6 +3,7 @@ package com.g96.ftms.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,11 +16,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Builder
 public class GradeSetting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "grade_setting_id")
-    private Long roomId;
+    private Long gradeSettingId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_id")
@@ -36,6 +38,9 @@ public class GradeSetting {
     @JsonBackReference
     private MarkScheme markScheme;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime dateLock = LocalDateTime.now();
+    @Column(nullable = false)
+    private LocalDateTime dateLock;
+
+    @Column
+    private Boolean isLock;
 }

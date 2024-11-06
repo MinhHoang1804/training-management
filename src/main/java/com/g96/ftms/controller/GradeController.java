@@ -22,4 +22,9 @@ public class GradeController {
     public ApiResponse<?> getGradeByUser(@RequestBody GradeRequest.GradedDetailRequest model) {
         return gradeService.getGradeDetail(model);
     }
+
+    @PostMapping("/save-grade-setting")
+    public ApiResponse<?> saveGradeSetting(@RequestBody GradeRequest.GradeSettingUpdateRequest model) {
+        return gradeService.saveGradeSetting(model);
+    }
 }

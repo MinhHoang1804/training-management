@@ -5,21 +5,17 @@ import com.g96.ftms.dto.request.GradeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.GradeResponse;
 import com.g96.ftms.entity.Class;
-import com.g96.ftms.entity.Grade;
-import com.g96.ftms.entity.GradeSetting;
-import com.g96.ftms.entity.User;
+import com.g96.ftms.entity.*;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
-import com.g96.ftms.repository.ClassRepository;
-import com.g96.ftms.repository.GradeRepository;
-import com.g96.ftms.repository.UserClassRelationRepository;
-import com.g96.ftms.repository.UserRepository;
+import com.g96.ftms.repository.*;
 import com.g96.ftms.service.grade.IGradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +27,11 @@ import java.util.stream.Collectors;
 public class GradeService implements IGradeService {
     private final UserClassRelationRepository userClassRelationRepository;
     private final GradeRepository gradeRepository;
+    private final GradeSettingRepository gradeSettingRepository;
     private final UserRepository userRepository;
     private final ClassRepository classRepository;
+    private final SubjectRepository subjectRepository;
+    private final MarkSchemeRepository markSchemeRepository;
 
     @Override
     public ApiResponse<PagedResponse<GradeResponse.GradeInfoDTO>> search(GradeRequest.GradePagingRequest model) {
@@ -82,6 +81,35 @@ public class GradeService implements IGradeService {
         gradesByUserId.setGradeComponentList(newComponentGrades);
 
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), gradesByUserId);
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<?> saveGradeSetting(GradeRequest.GradeSettingUpdateRequest model) {
+        GradeSetting setting = gradeSettingRepository.findByClasss_ClassIdAndSubject_SubjectId(model.getClassId(), model.getSubjectId());
+
+        Class classs = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+
+        Subject subject = subjectRepository.findById(model.getSubjectId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        if(setting == null){ //have not setting yet -->create new
+            GradeSetting g= GradeSetting.builder().classs(classs).subject(subject).isLock(false).build();
+            GradeSetting settingSave = gradeSettingRepository.save(g);
+            // save mark schmeme
+            List<MarkScheme>listSchemes=new ArrayList<>();
+            for (Map.Entry<String, Double> entry : model.getComponents().entrySet()) {
+                System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+                MarkScheme markScheme= MarkScheme.builder().markName(entry.getKey()).markWeight(entry.getValue()).status(true).subject(subject).build();
+                listSchemes.add(markScheme);
+            }
+            markSchemeRepository.saveAll(listSchemes);
+            return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), g);
+        }else{  //exist setting
+            //disabled all scheme
+            setting.
+        }
+        return null;
     }
 
 
