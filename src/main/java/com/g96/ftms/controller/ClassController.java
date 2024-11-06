@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/grade-management")
+@RequestMapping("/api/v1/class-management")
 @RequiredArgsConstructor
 public class ClassController {
     private final IClassService classService;
@@ -19,5 +19,10 @@ public class ClassController {
     @GetMapping("/detail/{id}")
     public ApiResponse<?> getClass(@PathVariable("id") Long classId) {
         return classService.getClassDetail(classId);
+    }
+
+    @PostMapping("/add")
+    public ApiResponse<?> addClass(@RequestBody ClassRequest.ClassAddRequest model) {
+        return classService.addClass(model);
     }
 }
