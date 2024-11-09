@@ -67,6 +67,7 @@ public class FeedbackService implements IFeedBackService {
                 .subjectName(feedback.getSubject().getSubjectName())
                 .avgRating(feedback.getAvgRating())
                 .openDate(feedback.getOpenTime())
+                .description(feedback.getDescription())
                 .endDate(feedback.getLastUpdateTime())
                 .questionAnswerForm(questionAnswerForm)
                 .build();

@@ -37,6 +37,7 @@ public class FeedBackResponse {
         private String subjectCode;
         private String subjectName;
         private Double avgRating;
+        private String description;
         private LocalDateTime openDate;
         private LocalDateTime endDate;
         List<QuestionAnswerFormInfoDTO> questionAnswerForm;

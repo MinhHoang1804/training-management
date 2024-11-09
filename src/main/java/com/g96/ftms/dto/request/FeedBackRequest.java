@@ -24,7 +24,7 @@ public class FeedBackRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class FeedBackDetailFormRequest extends PagingBaseParams {
+    public static class FeedBackDetailFormRequest{
         private Long feedBackId;
     }
 }

@@ -30,7 +30,8 @@ public class FeedBack {
 
     @Column
     private LocalDateTime openTime;
-
+    @Column
+    private String description;
     @Column
     private LocalDateTime lastUpdateTime;
 
