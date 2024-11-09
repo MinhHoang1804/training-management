@@ -105,9 +105,6 @@ public class GradeService implements IGradeService {
             }
             markSchemeRepository.saveAll(listSchemes);
             return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), g);
-        }else{  //exist setting
-            //disabled all scheme
-            setting.
         }
         return null;
     }

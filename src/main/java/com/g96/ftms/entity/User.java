@@ -81,6 +81,9 @@ public class User {
     @JsonBackReference
     List<UserClassRelation> userClassRelationList;
 
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<FeedBack> feedBackList;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(

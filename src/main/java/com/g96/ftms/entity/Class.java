@@ -57,5 +57,9 @@ public class Class {
 
     @OneToMany(mappedBy = "classs", fetch = FetchType.LAZY)
     private List<Grade> grades;
+
+    @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<FeedBack> feedBackList;
 }
 
