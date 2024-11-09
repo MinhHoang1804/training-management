@@ -8,4 +8,5 @@ import com.g96.ftms.dto.response.FeedBackResponse;
 public interface IFeedBackService
 {
     ApiResponse<PagedResponse<FeedBackResponse.FeedBackInfoDTO>> search(FeedBackRequest.FeedBackPagingRequest model);
+    ApiResponse<FeedBackResponse.FeedBackFormDTO> getFeedBackFormDetail(FeedBackRequest.FeedBackDetailFormRequest model);
 }

@@ -1,5 +1,6 @@
 package com.g96.ftms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "feedback")
@@ -43,4 +45,8 @@ public class FeedBack {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "feedback", fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<FeedbackAnswer> feedbackAnswerList;
 }

@@ -19,4 +19,12 @@ public class FeedBackRequest {
         private Long subjectId;
 
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class FeedBackDetailFormRequest extends PagingBaseParams {
+        private Long feedBackId;
+    }
 }
