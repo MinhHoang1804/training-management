@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 public class GradeService implements IGradeService {
     private final UserClassRelationRepository userClassRelationRepository;
     private final GradeRepository gradeRepository;
-    private final GradeSettingRepository gradeSettingRepository;
     private final UserRepository userRepository;
     private final ClassRepository classRepository;
     private final SubjectRepository subjectRepository;
@@ -63,50 +62,21 @@ public class GradeService implements IGradeService {
     }
 
     @Override
-    public ApiResponse<GradeResponse.GradeInfoDTO> getGradeDetail(GradeRequest.GradedDetailRequest model) {
-        Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
-                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
-        List<GradeSetting> gradeSettingList = c.getGradeSettingList();
-        //get grade infor
-        GradeResponse.GradeInfoDTO gradesByUserId = getGradesByUserId(model.getUserId(), model.getClassId());
-        //update grade weight
-        List<GradeResponse.GradeComponent> newComponentGrades = gradesByUserId.getGradeComponentList().stream().peek(item->{
-            for (GradeSetting gradeSetting:gradeSettingList){
-                if(gradeSetting.getSubject().getSubjectName().equalsIgnoreCase(item.getSubjectName())){
-                    item.setWeight(gradeSetting.getMarkScheme().getMarkWeight());
-                }
-            }
-        }).toList();
-
-        gradesByUserId.setGradeComponentList(newComponentGrades);
-
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), gradesByUserId);
+    public ApiResponse<GradeResponse.GradeSubjectSchemeDetail> getSubjectGradeDetail(GradeRequest.GradedSubjectRequest model) {
+        Grade grade = gradeRepository.findByUser_UserIdAndClasss_ClassIdAndSubject_SubjectIdAndMarkScheme_MarkSchemeId(model.getUserId(), model.getClassId(), model.getSubjectId(), model.getMarkSchemeId());
+        GradeResponse.GradeSubjectSchemeDetail response = GradeResponse.GradeSubjectSchemeDetail.builder()
+                .traineeName(grade.getUser().getFullName())
+                .grade(grade.getGrade())
+                .lastUpdate(grade.getGradeDate())
+                .build();
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), null);
     }
 
     @Override
     @Transactional
     public ApiResponse<?> saveGradeSetting(GradeRequest.GradeSettingUpdateRequest model) {
-        GradeSetting setting = gradeSettingRepository.findByClasss_ClassIdAndSubject_SubjectId(model.getClassId(), model.getSubjectId());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), null);
 
-        Class classs = classRepository.findById(model.getClassId()).orElseThrow(() ->
-                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
-
-        Subject subject = subjectRepository.findById(model.getSubjectId()).orElseThrow(() ->
-                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
-        if(setting == null){ //have not setting yet -->create new
-            GradeSetting g= GradeSetting.builder().classs(classs).subject(subject).isLock(false).build();
-            GradeSetting settingSave = gradeSettingRepository.save(g);
-            // save mark schmeme
-            List<MarkScheme>listSchemes=new ArrayList<>();
-            for (Map.Entry<String, Double> entry : model.getComponents().entrySet()) {
-                System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-                MarkScheme markScheme= MarkScheme.builder().markName(entry.getKey()).markWeight(entry.getValue()).status(true).subject(subject).build();
-                listSchemes.add(markScheme);
-            }
-            markSchemeRepository.saveAll(listSchemes);
-            return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), g);
-        }
-        return null;
     }
 
 

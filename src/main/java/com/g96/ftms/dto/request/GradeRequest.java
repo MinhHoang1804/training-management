@@ -17,9 +17,11 @@ public class GradeRequest {
     }
     @Data
     @NoArgsConstructor
-    public static class GradedDetailRequest {
+    public static class GradedSubjectRequest {
         private Long userId;
         private Long classId;
+        private Long subjectId;
+        private Long markSchemeId;
     }
     @Data
     @NoArgsConstructor

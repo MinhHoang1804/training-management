@@ -51,9 +51,6 @@ public class Class {
     @JsonBackReference
     List<UserClassRelation> userClassRelationList;
 
-    @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
-    @JsonBackReference
-    List<GradeSetting> gradeSettingList;
 
     @OneToMany(mappedBy = "classs", fetch = FetchType.LAZY)
     private List<Grade> grades;

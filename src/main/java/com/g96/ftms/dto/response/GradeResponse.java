@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class GradeResponse {
@@ -30,6 +31,16 @@ public class GradeResponse {
             this.grade = grade;
         }
         private Double weight;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    @Builder
+    public static class GradeSubjectSchemeDetail {
+        private String traineeName;
+        private Double grade;
+        private LocalDateTime lastUpdate;
     }
 
 

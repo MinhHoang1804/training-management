@@ -37,8 +37,7 @@ public class MarkScheme {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    @OneToMany(mappedBy = "markScheme",fetch = FetchType.LAZY)
-    @JsonBackReference
-    List<GradeSetting> gradeSettingList;
+    @OneToMany(mappedBy = "markScheme", fetch = FetchType.LAZY)
+    private List<Grade> grades;
 
 }

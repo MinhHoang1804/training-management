@@ -18,9 +18,9 @@ public class GradeController {
     public ApiResponse<?> getGradeList(@RequestBody GradeRequest.GradePagingRequest model) {
         return gradeService.search(model);
     }
-    @PostMapping("/my-grade")
-    public ApiResponse<?> getGradeByUser(@RequestBody GradeRequest.GradedDetailRequest model) {
-        return gradeService.getGradeDetail(model);
+    @PostMapping("/subject-grade-detail")
+    public ApiResponse<?> getSubjectGradeDetail(@RequestBody GradeRequest.GradedSubjectRequest model) {
+        return gradeService.getSubjectGradeDetail(model);
     }
 
     @PostMapping("/save-grade-setting")
