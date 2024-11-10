@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ClassRepository  extends JpaRepository<Class, Long> {
     @Query("SELECT c FROM Class c WHERE " +
@@ -17,4 +19,6 @@ public interface ClassRepository  extends JpaRepository<Class, Long> {
     Page<Class> searchFilter(@Param("keywordFilter") String keywordFilter,
                                   @Param("status") Boolean status,
                                   Pageable pageable);
+
+    List<Class> findByCurriculum_CurriculumId(Long curriculumId);
 }

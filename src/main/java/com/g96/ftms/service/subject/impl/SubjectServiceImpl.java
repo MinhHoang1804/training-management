@@ -6,10 +6,13 @@ import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SchemeResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
+import com.g96.ftms.entity.Class;
+import com.g96.ftms.entity.CurriculumSubjectRelation;
 import com.g96.ftms.entity.MarkScheme;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
+import com.g96.ftms.repository.ClassRepository;
 import com.g96.ftms.repository.CurriculumRepository;
 import com.g96.ftms.repository.SchemeRepository;
 import com.g96.ftms.repository.SubjectRepository;
@@ -36,6 +39,7 @@ public class SubjectServiceImpl implements ISubjectService {
 
     private final CurriculumRepository curriculumRepository;
     private final SchemeRepository schemeRepository;
+    private final ClassRepository classRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -122,6 +126,12 @@ public class SubjectServiceImpl implements ISubjectService {
         List<SubjectResponse.SubjectOptionDTO> response = mapper.map(list, new TypeToken<List<SubjectResponse.SubjectOptionDTO>>() {
         }.getType());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    public List<Subject> getSubjectInClass(Long classId){
+        Class c = classRepository.findById(classId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        return c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
     }
 
 }

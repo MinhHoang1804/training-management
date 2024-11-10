@@ -18,5 +18,5 @@ public interface ISubjectService {
     ApiResponse<Subject> addSubject(SubjectRequest.SubjectAddRequest model);
     //get subject for option
     ApiResponse<List<SubjectResponse.SubjectOptionDTO>> getAllSubjectOption();
-
+    public List<Subject>getSubjectInClass(Long classId);
 }

@@ -33,4 +33,8 @@ public class Curriculum {
     @OneToMany(mappedBy = "curriculum", fetch = FetchType.LAZY)
     @JsonBackReference
     List<CurriculumSubjectRelation> curriculumSubjectRelationList;
+
+    @OneToMany(mappedBy = "curriculum", fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<Class> classes;
 }

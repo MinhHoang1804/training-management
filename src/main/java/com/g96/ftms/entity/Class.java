@@ -58,5 +58,9 @@ public class Class {
     @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
     @JsonBackReference
     List<FeedBack> feedBackList;
+
+    @ManyToOne
+    @JoinColumn(name = "curriculum_id")
+    private Curriculum curriculum;
 }
 
