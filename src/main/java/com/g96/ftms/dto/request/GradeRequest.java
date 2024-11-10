@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 public class GradeRequest {
@@ -26,9 +27,15 @@ public class GradeRequest {
     @Data
     @NoArgsConstructor
     public static class GradeSettingUpdateRequest {
-        private Long subjectId;
-        private Long classId;
+       List<GradeSettingUpdateInfo> schemes;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class GradeSettingUpdateInfo {
+        private Long schemeId;
         private LocalDateTime dateLock;
-        private Map<String,Double >components;
+        private String markName;
+        private Double markWeight;
     }
 }

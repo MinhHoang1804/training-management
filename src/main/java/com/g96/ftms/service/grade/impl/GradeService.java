@@ -12,6 +12,7 @@ import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.grade.IGradeService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class GradeService implements IGradeService {
     private final ClassRepository classRepository;
     private final SubjectRepository subjectRepository;
     private final MarkSchemeRepository markSchemeRepository;
-
+    private final ModelMapper mapper;
     @Override
     public ApiResponse<PagedResponse<GradeResponse.GradeInfoDTO>> search(GradeRequest.GradePagingRequest model) {
         List<GradeResponse.GradeInfoDTO> list = new ArrayList<>();
@@ -77,8 +78,22 @@ public class GradeService implements IGradeService {
     @Override
     @Transactional
     public ApiResponse<?> saveGradeSetting(GradeRequest.GradeSettingUpdateRequest model) {
+        List<MarkScheme> list = model.getSchemes().stream().filter(s -> s.getSchemeId() != null)
+                .map(item->{
+                   return mapper.map(item, MarkScheme.class);
+                }).toList();
+        //save entity exist;
+        markSchemeRepository.saveAll(list);
+        List<MarkScheme> newList = model.getSchemes().stream().filter(s -> s.getSchemeId() == null)
+                .map(item->{
+                    return mapper.map(item, MarkScheme.class);
+                }).toList();
+        if(!newList.isEmpty()){
+            markSchemeRepository.saveAll(newList);
+        }
+        //save new entity
+        //remove all grade
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), null);
-
     }
 
 
