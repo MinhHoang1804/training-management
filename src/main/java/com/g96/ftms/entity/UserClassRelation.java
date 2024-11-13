@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_class")
@@ -12,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class UserClassRelation {
     @EmbeddedId
     UserClassRelationId id;
@@ -24,4 +29,8 @@ public class UserClassRelation {
     @MapsId("classId")
     @JoinColumn(name = "class_id")
     private Class classs;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
 }

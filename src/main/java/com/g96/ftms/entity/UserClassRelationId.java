@@ -10,8 +10,12 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor
 @Builder
-@AllArgsConstructor
 public class UserClassRelationId implements Serializable {
+    public UserClassRelationId(Long userId, Long classId) {
+        this.userId = userId;
+        this.classId = classId;
+    }
+
     @Column(name = "user_id")
     private Long userId;
 

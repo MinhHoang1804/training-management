@@ -4,11 +4,14 @@ import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.request.TraineeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.trainee.ITraineeService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,5 +21,10 @@ public class TraineeController {
     @PostMapping("/search")
     public ApiResponse<?> getSubjectList(@RequestBody TraineeRequest.TraineePagingRequest model) {
         return traineeService.search(model);
+    }
+
+    @PostMapping(value = "/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<?> importTrainees( @RequestParam("classId") Long classId ,@Parameter(description = "File Excel to upload") @RequestParam("file") MultipartFile file) {
+            return traineeService.importExcelFile(file,classId);
     }
 }

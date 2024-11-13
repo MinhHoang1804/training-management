@@ -57,7 +57,7 @@ public class Schedule {
     private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subbject_id")
+    @JoinColumn(name = "subject_id")
     @JsonBackReference
     private Subject subject;
 

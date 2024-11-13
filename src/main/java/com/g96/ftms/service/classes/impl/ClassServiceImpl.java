@@ -32,6 +32,7 @@ public class ClassServiceImpl implements IClassService {
     private final SubjectRepository subjectRepository;
     private final ScheduleRepository scheduleRepository;
     private final RoomRepository roomRepository;
+    private final CurriculumRepository curriculumRepository;
 
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
@@ -74,6 +75,10 @@ public class ClassServiceImpl implements IClassService {
         Room room = roomRepository.findById(model.getRoomId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
 
         Class map = mapper.map(model, Class.class);
+
+        Curriculum curriculum = curriculumRepository.findById(model.getCurriculumId())
+                .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
+        map.setCurriculum(curriculum);
         //save entity
         Class classSave = classRepository.save(map);
         //create schedule

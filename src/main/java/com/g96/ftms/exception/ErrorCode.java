@@ -39,7 +39,9 @@ public enum ErrorCode {
     CLASS_NOT_FOUND("ERR030","Không tìm thấy lớp học"),
     QUESTION_TYPE_WRONG_FORMAT("ERR031","Sai định dạng câu hỏi"),
     QUESTION_NOT_FOUND("ERR032","Không tìm thấy câu hỏi"),
-    FEEDBACK_NOT_FOUND("ERR033","Không tìm thấy form feedback");
+    FEEDBACK_NOT_FOUND("ERR033","Không tìm thấy form feedback"),
+    FILE_EMPTY("ERR034","File trống "),
+    FILE_WRONG_FORMAT("ERR035","File sai format");
     private final String code;
     private final String message;
 
