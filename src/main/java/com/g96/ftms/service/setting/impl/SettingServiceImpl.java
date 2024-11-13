@@ -55,7 +55,7 @@ public class SettingServiceImpl implements ISettingService {
         Settings byDescription = settingsRepository.findByDescription(model.getDescription());
         //create setting generation with group required match type
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
-            Generation generation = generationRepository.findByGenerationName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
+            Generation generation = generationRepository.findByGenerationName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NOT_FOUND));
             setting.setGeneration(generation);
             //check desc exist
             if(byDescription!=null&&byDescription.getGeneration()!=null){
