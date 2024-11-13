@@ -18,7 +18,12 @@ public class FeedBackController {
         return feedBackService.search(model);
     }
     @PostMapping("/detail")
-    public ApiResponse<?> getFeedBackFormDetail(@PathVariable FeedBackRequest.FeedBackDetailFormRequest model) {
+    public ApiResponse<?> getFeedBackFormDetail(@RequestBody FeedBackRequest.FeedBackDetailFormRequest model) {
         return feedBackService.getFeedBackFormDetail(model);
+    }
+
+    @PostMapping("/create")
+    public ApiResponse<?> createFeedBack(@RequestBody FeedBackRequest.FeedBackAddRequest model) {
+        return feedBackService.createSubject(model);
     }
 }

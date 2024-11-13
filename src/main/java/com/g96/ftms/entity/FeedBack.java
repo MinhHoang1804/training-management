@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class FeedBack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,16 +26,18 @@ public class FeedBack {
     Long feedbackId;
 
     @Column
-    private Double avgRating;
+    private Double avgRating=0.0;
 
     @Column
-    private LocalDateTime feedBackDate = LocalDateTime.now();
+    private LocalDateTime feedBackDate;
 
     @Column
     private LocalDateTime openTime;
+
     @Column
     private String description;
     @Column
+    @LastModifiedDate
     private LocalDateTime lastUpdateTime;
 
     @ManyToOne

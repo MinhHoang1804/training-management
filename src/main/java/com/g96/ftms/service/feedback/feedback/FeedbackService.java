@@ -4,19 +4,19 @@ import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.FeedBackRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.FeedBackResponse;
-import com.g96.ftms.entity.FeedBack;
-import com.g96.ftms.entity.FeedbackAnswer;
-import com.g96.ftms.entity.User;
+import com.g96.ftms.entity.*;
+import com.g96.ftms.entity.Class;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
-import com.g96.ftms.repository.FeedBackRepository;
-import com.g96.ftms.repository.UserRepository;
+import com.g96.ftms.repository.*;
 import com.g96.ftms.service.feedback.IFeedBackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +25,10 @@ import java.util.stream.Collectors;
 public class FeedbackService implements IFeedBackService {
     private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
+    private final SubjectRepository subjectRepository;
+    private final ClassRepository classRepository;
+    private final FeedBackAnswerRepository feedBackAnswerRepository;
+    private final QuestionsRepository questionsRepository;
     @Override
     public ApiResponse<PagedResponse<FeedBackResponse.FeedBackInfoDTO>> search(FeedBackRequest.FeedBackPagingRequest model) {
         Page<FeedBack> pages = feedBackRepository.searchFilter(model.getKeyword(), model.getUserId(), model.getSubjectId(), model.getClassId(), model.getPageable());
@@ -75,12 +79,41 @@ public class FeedbackService implements IFeedBackService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
 
     }
+
+    @Override
+    @Transactional
+    public ApiResponse<FeedBack> createSubject(FeedBackRequest.FeedBackAddRequest model) {
+        //create feed back
+        Subject subject = subjectRepository.findById(model.getSubjectId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        User user = userRepository.findById(model.getUserId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        Class aClass = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        FeedBack feedBack=FeedBack.builder()
+                .subject(subject).user(user).classs(aClass)
+                .description(model.getDescription())
+                .openTime(model.getOpenTime())
+                .feedBackDate(model.getFeedBackDate())
+                .build();
+                feedBackRepository.save(feedBack);
+        //save feedback
+        List<FeedbackAnswer>listFeedBack=new ArrayList<>();
+        for(FeedBackRequest.QuestionAnswerFormRequest qa:model.getListAnswers()){
+            Questions questions = questionsRepository.findById(qa.getQuestionId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.QUESTION_NOT_FOUND));
+            FeedbackAnswer feedbackAnswer = fillAnswerFeedBack(questions, feedBack, qa.getAnswer());
+            listFeedBack.add(feedbackAnswer);
+        }
+        feedBackAnswerRepository.saveAll(listFeedBack);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), feedBack);
+    }
+
     private FeedBackResponse.QuestionAnswerFormInfoDTO mapToQuestionAnswerFormInfoDTO(FeedbackAnswer feedbackAnswer) {
         // Xác định câu trả lời dựa trên questionType
         String answer;
         switch (feedbackAnswer.getQuestion().getQuestionType()) {
             case RATING:
-                answer = feedbackAnswer.getRating() != null ? feedbackAnswer.getRating().toString() : "No Rating";
+                answer = feedbackAnswer.getRating() != null ? feedbackAnswer.getRating().toString() : "No Answer";
                 break;
             case YES_NO:
                 answer = feedbackAnswer.getYesNoAnswer() != null ? feedbackAnswer.getYesNoAnswer().toString() : "No Answer";
@@ -98,5 +131,25 @@ public class FeedbackService implements IFeedBackService {
                 .questions(feedbackAnswer.getQuestion())
                 .answer(answer)
                 .build();
+    }
+    private FeedbackAnswer fillAnswerFeedBack(Questions question,FeedBack feedBack,String answer){
+        FeedbackAnswer feedbackAnswer= FeedbackAnswer.builder()
+                .feedback(feedBack)
+                .question(question)
+                .build();
+        switch (question.getQuestionType()) {
+            case RATING:
+                feedbackAnswer.setRating(Double.parseDouble(answer));
+                break;
+            case YES_NO:
+                feedbackAnswer.setYesNoAnswer(Boolean.parseBoolean(answer));
+                break;
+            case TEXT:
+                feedbackAnswer.setTextAnswer(answer);
+                break;
+            default:
+                throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.QUESTION_TYPE_WRONG_FORMAT);
+        }
+        return  feedbackAnswer;
     }
 }

@@ -36,7 +36,9 @@ public enum ErrorCode {
     SETTING_NOTFOUND("ERR027","Không tìm thấy setting"),
     GENERATION_NOT_FOUND("ERR028","Generation này không tồn tại"),
     DUPLICATE_SETTING("ERR029","Setting đã tồn tại"),
-    CLASS_NOT_FOUND("ERR030","Không tìm thấy lớp học");
+    CLASS_NOT_FOUND("ERR030","Không tìm thấy lớp học"),
+    QUESTION_TYPE_WRONG_FORMAT("ERR031","Sai định dạng câu hỏi"),
+    QUESTION_NOT_FOUND("ERR032","Không tìm thấy câu hỏi");
     private final String code;
     private final String message;
 
