@@ -4,6 +4,10 @@ import com.g96.ftms.dto.ChangePasswordDTO;
 import com.g96.ftms.dto.JwtResponeDTO;
 import com.g96.ftms.dto.LoginDTO;
 import com.g96.ftms.dto.UserDTO;
+import com.g96.ftms.dto.common.PagedResponse;
+import com.g96.ftms.dto.request.UserRequest;
+import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.UserResponse;
 import com.g96.ftms.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,5 +38,6 @@ public interface UserService {
     UserDTO getUserDetails(Long userId, Authentication authentication);
     ResponseEntity<?> addUser(UserDTO userDTO, Authentication authentication);
 
+    ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model);
 }
 

@@ -1,6 +1,8 @@
 package com.g96.ftms.controller;
 
 import com.g96.ftms.dto.UserDTO;
+import com.g96.ftms.dto.request.UserRequest;
+import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,11 @@ public class UserController {
     @PostMapping("/management/add")
     public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO, Authentication authentication) {
         return userService.addUser(userDTO, authentication);
+    }
+
+    @PostMapping("/search")
+    public ApiResponse<?> getSubjectList(@RequestBody UserRequest.UserPagingRequest model) {
+        return userService.search(model);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.g96.ftms.service.subject.impl;
 
-import com.g96.ftms.dto.SubjectDTO;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
@@ -22,7 +21,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

@@ -4,7 +4,12 @@ import com.g96.ftms.dto.ChangePasswordDTO;
 import com.g96.ftms.dto.JwtResponeDTO;
 import com.g96.ftms.dto.LoginDTO;
 import com.g96.ftms.dto.UserDTO;
+import com.g96.ftms.dto.common.PagedResponse;
+import com.g96.ftms.dto.request.UserRequest;
+import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.UserResponse;
 import com.g96.ftms.entity.Role;
+import com.g96.ftms.entity.Subject;
 import com.g96.ftms.entity.User;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
@@ -12,6 +17,8 @@ import com.g96.ftms.mapper.Mapper;
 import com.g96.ftms.repository.RoleRepository;
 import com.g96.ftms.repository.UserRepository;
 import com.g96.ftms.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,20 +36,21 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
+    private final PasswordEncoder passwordEncoder;
+
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private final ModelMapper mapper;
     @Override
     public User findByAccount(String account) {
         return userRepository.findByAccount(account);
@@ -216,6 +224,18 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         return ResponseEntity.ok("User created successfully");
+    }
+
+    @Override
+    public ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model) {
+        Page<User> pages = userRepository.searchFilter(model.getKeyword(), model.getStatus(), model.getPageable());
+        List<UserResponse.UserInfoDTO> list = pages.getContent().stream().map(item -> {
+            UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
+            map.setRole(item.getRole());
+            return map;
+        }).toList();
+        PagedResponse<UserResponse.UserInfoDTO> response = new PagedResponse<>(list, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
 }

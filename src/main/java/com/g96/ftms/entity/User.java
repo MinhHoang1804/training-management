@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 import java.sql.Date;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -74,14 +77,18 @@ public class User {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
+    @Column(name = "status")
+    private Boolean status;
+
+    @CreatedDate
     @Column(name = "created_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private java.util.Date createdDate;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonBackReference
     List<UserClassRelation> userClassRelationList;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonBackReference
     List<FeedBack> feedBackList;
 
@@ -103,6 +110,7 @@ public class User {
                 .map(Role::getRoleName)
                 .orElse(null);
     }
+
     @JsonProperty("roleNames")
     public String getRoleNames() {
         return roles.stream()
