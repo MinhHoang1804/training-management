@@ -28,7 +28,7 @@ public class FeedBackRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class FeedBackAddRequest extends PagingBaseParams {
+    public static class FeedBackAddRequest {
         private Long feedBackId;
         private Long questionId;
         private Long classId;
@@ -54,5 +54,15 @@ public class FeedBackRequest {
     public static class QuestionAnswerFormRequest{
         Long questionId;
         String answer;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class FeedBackEditRequest {
+        private Long feedBackId;
+        private String description;
+        List<QuestionAnswerFormRequest>listAnswers;
     }
 }
