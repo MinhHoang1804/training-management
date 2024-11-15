@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -55,21 +56,26 @@ public class SettingServiceImpl implements ISettingService {
         Settings byDescription = settingsRepository.findByDescription(model.getDescription());
         //create setting generation with group required match type
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
-            Generation generation = generationRepository.findByGenerationName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NOT_FOUND));
-            setting.setGeneration(generation);
-            //check desc exist
-            if(byDescription!=null&&byDescription.getGeneration()!=null){
+            Optional<Generation> generation = generationRepository.findByGenerationName(model.getSettingName());
+            if(byDescription.getGeneration().getGenerationName().equalsIgnoreCase(model.getSettingName())){ //not duplicate description with 1 generation
                 throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
+            }
+            if(!generation.isPresent()){
+                Generation g=Generation.builder().generationName(model.getSettingName()).build();
+                generationRepository.save(g);
             }
             settingsRepository.save(setting);
         }
         //create setting room
         if (model.getSettingGroup() == SettingGroupEnum.ROOM) {
-            Room room = roomRepository.findByRoomName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
-            if(byDescription!=null&&byDescription.getRoom()!=null){
+            if(byDescription.getRoom().getRoomName().equalsIgnoreCase(model.getSettingName())){
                 throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
             }
-            setting.setRoom(room);
+            Optional<Room> byRoomName = roomRepository.findByRoomName(model.getSettingName());
+            if(!byRoomName.isPresent()){
+                Room room=Room.builder().roomName(model.getSettingName()).build();
+                roomRepository.save(room);
+            }
             settingsRepository.save(setting);
         }
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
