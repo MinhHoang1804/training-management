@@ -50,9 +50,4 @@ public class SubjectController {
     public ApiResponse<Subject> updateSubject(@RequestBody SubjectRequest.SubjectEditRequest model) {
         return subjectService.updateSubject(model);
     }
-
-    @PostMapping(value = "/import-session",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<?> importSession(@Parameter(description = "File Excel to upload") @RequestParam("file") MultipartFile file) {
-        return subjectService.importExcelFile(file);
-    }
 }
