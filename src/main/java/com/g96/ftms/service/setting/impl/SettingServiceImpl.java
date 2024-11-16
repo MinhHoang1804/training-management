@@ -5,12 +5,12 @@ import com.g96.ftms.dto.request.SettingRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SettingResponse;
 import com.g96.ftms.entity.Generation;
-import com.g96.ftms.entity.Room;
+import com.g96.ftms.entity.Location;
 import com.g96.ftms.entity.Settings;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.GenerationRepository;
-import com.g96.ftms.repository.RoomRepository;
+import com.g96.ftms.repository.LocationRepository;
 import com.g96.ftms.repository.SettingsRepository;
 import com.g96.ftms.service.setting.ISettingService;
 import com.g96.ftms.util.constants.SettingGroupEnum;
@@ -31,7 +31,7 @@ public class SettingServiceImpl implements ISettingService {
     private final SettingsRepository settingsRepository;
     private final ModelMapper mapper;
     private final GenerationRepository generationRepository;
-    private final RoomRepository roomRepository;
+    private final LocationRepository locationRepository;
 
     @Override
     public ApiResponse<PagedResponse<SettingResponse.SettingInfoDTO>> search(SettingRequest.SettingPagingRequest model) {
@@ -40,7 +40,7 @@ public class SettingServiceImpl implements ISettingService {
 
         List<SettingResponse.SettingInfoDTO> settingInfoList = new ArrayList<>();
 
-        // Duyệt qua các settings và lấy dữ liệu từ Room và Generation
+        // Duyệt qua các settings và lấy dữ liệu từ Location và Generation
         for (Settings setting : pages) {
             SettingResponse.SettingInfoDTO settingInfoDTO = convertSettingToInfoDto(setting);
             settingInfoList.add(settingInfoDTO);
@@ -53,28 +53,36 @@ public class SettingServiceImpl implements ISettingService {
     @Transactional
     public ApiResponse<Settings> createSetting(SettingRequest.SettingAddRequest model) {
         Settings setting = mapper.map(model, Settings.class);
-        Settings byDescription = settingsRepository.findByDescription(model.getDescription());
         //create setting generation with group required match type
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
             Optional<Generation> generation = generationRepository.findByGenerationName(model.getSettingName());
-            if(byDescription.getGeneration().getGenerationName().equalsIgnoreCase(model.getSettingName())){ //not duplicate description with 1 generation
+            //check duplicate
+            if(settingsRepository.existsByDescriptionAndGeneration_GenerationName(model.getDescription(),model.getSettingName())){
                 throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
             }
             if(!generation.isPresent()){
                 Generation g=Generation.builder().generationName(model.getSettingName()).build();
                 generationRepository.save(g);
+                setting.setGeneration(g);
+            }else{
+                setting.setGeneration(generation.get());
             }
             settingsRepository.save(setting);
         }
-        //create setting room
-        if (model.getSettingGroup() == SettingGroupEnum.ROOM) {
-            if(byDescription.getRoom().getRoomName().equalsIgnoreCase(model.getSettingName())){
+        //create setting location
+        if (model.getSettingGroup() == SettingGroupEnum.LOCATION) {
+            //check duplicate
+            if(settingsRepository.existsByDescriptionAndLocation_LocationName(model.getDescription(),model.getSettingName())){
                 throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
             }
-            Optional<Room> byRoomName = roomRepository.findByRoomName(model.getSettingName());
-            if(!byRoomName.isPresent()){
-                Room room=Room.builder().roomName(model.getSettingName()).build();
-                roomRepository.save(room);
+            //save entity
+            Optional<Location> byLocation = locationRepository.findByLocationName(model.getSettingName());
+            if(!byLocation.isPresent()){
+                Location location = Location.builder().locationName(model.getSettingName()).build();
+                locationRepository.save(location);
+                setting.setLocation(location);
+            }else{
+                setting.setLocation(byLocation.get());
             }
             settingsRepository.save(setting);
         }
@@ -89,29 +97,57 @@ public class SettingServiceImpl implements ISettingService {
         }
         setting.setDescription(model.getDescription());
         //reset group;
-        setting.setRoom(null);
         if (setting.getGeneration() != null) {
             setting.setGeneration(null);
             settingsRepository.save(setting); //remove generation
-            generationRepository.delete(setting.getGeneration()); //delete generation
         }
-        settingsRepository.save(setting);
+        if (setting.getLocation() != null) {
+            setting.setLocation(null);
+            settingsRepository.save(setting); //remove generation
+        }
 
         //update group
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
-            if (!generationRepository.existsByGenerationName(model.getSettingName())) {
-                throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.GENERATION_NAME_SETTING_EXIST);
+            //check generation exist
+            Generation generation = setting.getGeneration();
+            if(generationRepository.existsByGenerationNameAndGetGenerationIdNot(model.getSettingName(),generation.getGetGenerationId())){
+                //check duplicate
+                if(settingsRepository.existsByDescriptionAndGeneration_GenerationName(model.getDescription(),model.getSettingName())){
+                    throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
+                }
+                Optional<Generation> byGenerationName = generationRepository.findByGenerationName(model.getSettingName());
+                if(byGenerationName.isPresent()){
+                    setting.setDescription(model.getDescription());
+                    setting.setGeneration(byGenerationName.get());
+                    settingsRepository.save(setting);
+                }
             }
-            Generation generation = Generation.builder().generationName(model.getSettingName()
-            ).build();
-            generationRepository.save(generation);
-            setting.setGeneration(generation);
+            //create new generation
+            Generation g=Generation.builder().generationName(model.getSettingName()).build();
+            generationRepository.save(g);
+            setting.setGeneration(g);
             settingsRepository.save(setting);
         }
-        //save setting room
-        if (model.getSettingGroup() == SettingGroupEnum.ROOM) {
-            Room room = roomRepository.findByRoomName(model.getSettingName()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
-            setting.setRoom(room);
+        //save setting location
+        if (model.getSettingGroup() == SettingGroupEnum.LOCATION) {
+            //check room exist
+            Location location = setting.getLocation();
+            if(locationRepository.existsByLocationNameAndLocationId(model.getSettingName(),location.getLocationId())){
+                //check duplicate
+                if(settingsRepository.existsByDescriptionAndLocation_LocationName(model.getDescription(),model.getSettingName())){
+                    throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
+                }
+                Optional<Location> byRoomName = locationRepository.findByLocationName(model.getSettingName());
+                if(byRoomName.isPresent()){
+                    setting.setLocation(byRoomName.get());
+                    setting.setDescription(model.getDescription());
+                    settingsRepository.save(setting);
+                }
+            }
+            //create new generation
+            Location g=Location.builder().locationName(model.getSettingName()).build();
+            locationRepository.save(g);
+            setting.setLocation(g);
             settingsRepository.save(setting);
         }
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
@@ -124,12 +160,12 @@ public class SettingServiceImpl implements ISettingService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
     public SettingResponse.SettingInfoDTO convertSettingToInfoDto(Settings setting) {
-        // Duyệt qua các settings và lấy dữ liệu từ Room và Generation
-        if (setting.getRoom() != null) {
+        // Duyệt qua các settings và lấy dữ liệu từ Location và Generation
+        if (setting.getLocation() != null) {
             SettingResponse.SettingInfoDTO dto = new SettingResponse.SettingInfoDTO();
             dto.setId(setting.getSettingId());
-            dto.setSettingName(setting.getRoom().getRoomName());
-            dto.setSettingGroup(SettingGroupEnum.ROOM.name());
+            dto.setSettingName(setting.getLocation().getLocationName());
+            dto.setSettingGroup(SettingGroupEnum.LOCATION.name());
             dto.setDescription(setting.getDescription());
             dto.setStatus(setting.getStatus());
             return dto;

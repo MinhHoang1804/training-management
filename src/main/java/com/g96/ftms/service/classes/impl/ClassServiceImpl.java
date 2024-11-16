@@ -10,7 +10,6 @@ import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.classes.IClassService;
-import com.g96.ftms.service.curriculum.ICurriculumService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,7 +30,7 @@ public class ClassServiceImpl implements IClassService {
     private final ModelMapper mapper;
     private final SubjectRepository subjectRepository;
     private final ScheduleRepository scheduleRepository;
-    private final RoomRepository roomRepository;
+    private final LocationRepository locationRepository;
     private final CurriculumRepository curriculumRepository;
 
     @Override
@@ -71,8 +70,8 @@ public class ClassServiceImpl implements IClassService {
         if (user == null) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
         }
-        //check room Exist
-        Room room = roomRepository.findById(model.getRoomId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.ROOM_NOT_FOUND));
+        //check location Exist
+        Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
 
         Class map = mapper.map(model, Class.class);
 
@@ -86,7 +85,7 @@ public class ClassServiceImpl implements IClassService {
         List<Schedule> scheduleList = new ArrayList<>();
         for (Subject subject : subjectsInCurriculum) {
             Schedule schedule = Schedule.builder().startTime(model.getStartDate()).endTime(model.getEndDate()).status(true)
-                    .classs(map).subject(subject).room(room).userId(user.getUserId()).description(model.getDescriptions()).build();
+                    .classs(map).subject(subject).location(location).userId(user.getUserId()).description(model.getDescriptions()).build();
             scheduleList.add(schedule);
         }
         //save scheduleList

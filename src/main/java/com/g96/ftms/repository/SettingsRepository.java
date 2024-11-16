@@ -10,11 +10,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SettingsRepository extends JpaRepository<Settings, Long> {
+    boolean existsByDescriptionAndLocation_LocationName(String description, String locationName);
+    boolean existsByDescriptionAndGeneration_GenerationName(String description, String generationName);
     @Query("SELECT s FROM Settings s " +
-            "LEFT JOIN s.room r " +
+            "LEFT JOIN s.location r " +
             "LEFT JOIN s.generation g " +
             "WHERE (:keyword IS NULL OR s.description LIKE %:keyword% " +
-            "OR r.roomName LIKE %:keyword% " +
+            "OR r.locationName LIKE %:keyword% " +
             "OR g.generationName LIKE %:keyword%) " +
             "AND (:status IS NULL OR s.status = :status)")
     Page<Settings> searchAndFilter(

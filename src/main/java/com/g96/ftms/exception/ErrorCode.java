@@ -1,8 +1,6 @@
 package com.g96.ftms.exception; // Thay đổi theo cấu trúc gói của bạn
 
-import com.g96.ftms.entity.Subject;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 
@@ -31,7 +29,7 @@ public enum ErrorCode {
     DUPLICATE_SUBJECT_NAME("ERR022","Tên môn học đã tồn tại"),
     DUPLICATE_SUBJECT_CODE("ERR023","Mã môn học đã tồn tại"),
     DUPLICATE_CURRICULUM_NAME("ERR024","Tên chương trình học đã tồn tại"),
-    ROOM_NOT_FOUND("ERR025","Không tìm thấy tên phòng"),
+    LOCATION_NOT_FOUND("ERR025","Không tìm thấy địa chỉ"),
     GENERATION_NAME_SETTING_EXIST("ERR026","Setting cho generation này đã tồn tại"),
     SETTING_NOTFOUND("ERR027","Không tìm thấy setting"),
     GENERATION_NOT_FOUND("ERR028","Generation này không tồn tại"),

@@ -17,7 +17,7 @@ public class ClassRequest {
     @NoArgsConstructor
     public static class ClassAddRequest {
         private String classCode;
-        private Long roomId;
+        private Long locationId;
         private Long curriculumId;
         private String admin;
         private String descriptions;
