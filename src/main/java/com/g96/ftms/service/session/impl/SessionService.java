@@ -2,8 +2,11 @@ package com.g96.ftms.service.session.impl;
 
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SessionResponse;
+import com.g96.ftms.entity.Session;
+import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
+import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.service.session.ISessionService;
 import com.g96.ftms.util.ExcelUltil;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class SessionService implements ISessionService {
-
+    private final SubjectRepository subjectRepository;
     @Override
     public ApiResponse<List<SessionResponse.SessionInfoDTO>> importExcelFile(MultipartFile file) {
         try {
@@ -32,6 +35,13 @@ public class SessionService implements ISessionService {
             e.printStackTrace();
         }
         throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_WRONG_FORMAT);
+    }
+
+    @Override
+    public ApiResponse<List<Session>> getSessionBySubjectId(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), subject.getSessionsList());
     }
 
     private List<SessionResponse.SessionInfoDTO> readExcelFile(MultipartFile file) throws IOException {

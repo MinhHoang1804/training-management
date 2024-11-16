@@ -44,6 +44,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/user/management/**").hasAnyRole("ADMIN","COORDINATOR", "CLASS_ADMIN", "TRAINER")
                         .requestMatchers("/api/v1/user/management/add").hasRole("ADMIN")
                         .requestMatchers("/api/v1/subject/**").permitAll()
+                        .requestMatchers("/api/v1/session-management/**").permitAll()
                         .requestMatchers("/api/v1/settings/**").permitAll()
                         .requestMatchers("/api/v1/class-management/**").permitAll()
                         .requestMatchers("/api/v1/trainee/**").permitAll()

@@ -124,12 +124,19 @@ public class SubjectServiceImpl implements ISubjectService {
 
         //save lesson
         List<SubjectRequest.SubjectLessonRequest> lessonList = model.getLessonList();
-       List<Session> sessionList= mapper.map(lessonList,new TypeToken<List<Session>>() {
-        }.getType());
-       sessionList.forEach(s -> s.setSubject(subject));
+        List<Session> sessionList = lessonList.stream()
+                .map(lesson -> {
+                    Session session = new Session();
+                    session.setLesson(lesson.getLesson());
+                    session.setDescription(lesson.getDescription());
+                    session.setSessionOrder(lesson.getSessionOrder());
+                    session.setSubject(subject);
+                    return session;
+                }).collect(Collectors.toList());
         sessionRepository.saveAll(sessionList);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),subject);
     }
+
 
     @Override
     public ApiResponse<List<SubjectResponse.SubjectOptionDTO>> getAllSubjectOption() {
