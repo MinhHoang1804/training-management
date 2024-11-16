@@ -27,4 +27,9 @@ public class SessionController {
     public ResponseEntity<byte[]> exportSessions(@PathVariable("subjectId") Long subjectId) {
         return sessionService.exportSessionsToExcel(subjectId);
     }
+
+    @GetMapping("/export-template")
+    public ResponseEntity<byte[]> exportTempalte() {
+        return sessionService.exportTemplate();
+    }
 }

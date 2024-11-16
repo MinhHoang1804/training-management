@@ -11,7 +11,11 @@ import java.util.List;
 
 public interface ISessionService {
     ApiResponse<List<SessionResponse.SessionInfoDTO>> importExcelFile(MultipartFile file);
+
     ApiResponse<List<Session>> getSessionBySubjectId(Long SubjectId);
 
     ResponseEntity<byte[]> exportSessionsToExcel(Long subjectId);
+
+    ResponseEntity<byte[]> exportTemplate();
+
 }

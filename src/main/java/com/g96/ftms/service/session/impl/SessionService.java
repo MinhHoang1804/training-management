@@ -125,6 +125,43 @@ public class SessionService implements ISessionService {
         }
     }
 
+    public ResponseEntity<byte[]> exportTemplate() {
+
+        // Tạo Workbook và Sheet
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Sessions");
+
+            // Tạo tiêu đề cột
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Lesson", "Description", "Order"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(createHeaderStyle(workbook));
+            }
+
+            // Tự động điều chỉnh kích thước cột
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Ghi dữ liệu ra mảng byte
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            byte[] excelBytes = outputStream.toByteArray();
+
+            // Trả file Excel dưới dạng ResponseEntity
+            HttpHeaders headersResponse = new HttpHeaders();
+            headersResponse.add("Content-Disposition", "attachment; filename=sessions_template.xlsx");
+            return ResponseEntity
+                    .ok()
+                    .headers(headersResponse)
+                    .body(excelBytes);
+
+        } catch (IOException e) {
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR,ErrorCode.EXPORT_FAILED);
+        }
+    }
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
