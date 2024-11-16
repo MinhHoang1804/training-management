@@ -87,7 +87,6 @@ public class SubjectServiceImpl implements ISubjectService {
         schemeRepository.deleteBySubject_SubjectId(subject.getSubjectId());
 
         // set new scheme
-        List<SchemeResponse.SubjectSchemeInfo> schemes = model.getSchemes();
         List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
             MarkScheme scheme = mapper.map(s, MarkScheme.class);
             scheme.setStatus(true);
@@ -127,6 +126,7 @@ public class SubjectServiceImpl implements ISubjectService {
         List<SubjectRequest.SubjectLessonRequest> lessonList = model.getLessonList();
        List<Session> sessionList= mapper.map(lessonList,new TypeToken<List<Session>>() {
         }.getType());
+       sessionList.forEach(s -> s.setSubject(subject));
         sessionRepository.saveAll(sessionList);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }

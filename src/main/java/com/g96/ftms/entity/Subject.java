@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -24,24 +25,25 @@ public class Subject {
     @Column(name = "subject_id")
     private Long subjectId;
 
-    @Column(nullable = false)
+    @Column
     private String subjectCode;
 
-    @Column(nullable = false)
+    @Column
     private String subjectName;
 
-    @Column(nullable = false)
+    @Column
     private String documentLink;
 
-    @Column(nullable = false)
+    @Column
     private boolean status = true;
 
     private String descriptions;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdDate = LocalDateTime.now();
+    @Column(updatable = false)
+    @CreatedDate
+    private LocalDateTime createdDate;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "subject",fetch = FetchType.LAZY)

@@ -22,13 +22,20 @@ public class SubjectRequest {
 //        private String documentLink;
         private String descriptions;
         private boolean status;
-        List<SchemeResponse.SubjectSchemeInfo>schemes;
+        List<SubjectSchemeaddRequest>schemes;
         List<SubjectLessonRequest>lessonList;
     }
     @Data
     @NoArgsConstructor
     public static class SubjectEditRequest extends SubjectAddRequest{
         private Long id;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class SubjectSchemeaddRequest {
+        private String markName;
+        private Double markWeight;
     }
 
     @Data
