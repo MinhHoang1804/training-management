@@ -1,17 +1,20 @@
 package com.g96.ftms.service.session.impl;
 
+import com.g96.ftms.dto.request.SessionRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.entity.Session;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
+import com.g96.ftms.repository.SessionRepository;
 import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.service.session.ISessionService;
 import com.g96.ftms.util.ExcelUltil;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +30,18 @@ import java.util.List;
 @Service
 public class SessionService implements ISessionService {
     private final SubjectRepository subjectRepository;
+    private final SessionRepository sessionRepository;
+    private final ModelMapper mapper;
+
     @Override
     public ApiResponse<List<SessionResponse.SessionInfoDTO>> importExcelFile(MultipartFile file) {
         try {
             List<SessionResponse.SessionInfoDTO> sessionInfoDTOS = readExcelFile(file);
             return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), sessionInfoDTOS);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_WRONG_FORMAT);
+        throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.FILE_WRONG_FORMAT);
     }
 
     @Override
@@ -58,8 +64,8 @@ public class SessionService implements ISessionService {
                 String lesson = ExcelUltil.getCellValueAsString(row.getCell(0));  // cột lesson
                 String description = ExcelUltil.getCellValueAsString(row.getCell(1));  // cột description
                 String sessionOrder = ExcelUltil.getCellValueAsString(row.getCell(2));  // cột sessionOrder
-                if(lesson!=null||description!=null||sessionOrder!=null){
-                    SessionResponse.SessionInfoDTO item= SessionResponse.SessionInfoDTO.builder()
+                if (lesson != null || description != null || sessionOrder != null) {
+                    SessionResponse.SessionInfoDTO item = SessionResponse.SessionInfoDTO.builder()
                             .sessionOrder(Integer.valueOf(sessionOrder))
                             .lesson(lesson)
                             .description(description)
@@ -121,7 +127,7 @@ public class SessionService implements ISessionService {
                     .body(excelBytes);
 
         } catch (IOException e) {
-            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR,ErrorCode.EXPORT_FAILED);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.EXPORT_FAILED);
         }
     }
 
@@ -159,9 +165,17 @@ public class SessionService implements ISessionService {
                     .body(excelBytes);
 
         } catch (IOException e) {
-            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR,ErrorCode.EXPORT_FAILED);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.EXPORT_FAILED);
         }
     }
+
+    @Override
+    public ApiResponse<?> updateSessionUpdateSession(SessionRequest.SessionEditRequest model) {
+        Session map = mapper.map(model, Session.class);
+        sessionRepository.save(map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+    }
+
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();

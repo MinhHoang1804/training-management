@@ -1,6 +1,7 @@
 package com.g96.ftms.service.session;
 
 
+import com.g96.ftms.dto.request.SessionRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.entity.Session;
@@ -18,4 +19,5 @@ public interface ISessionService {
 
     ResponseEntity<byte[]> exportTemplate();
 
+    ApiResponse<?> updateSessionUpdateSession(SessionRequest.SessionEditRequest model);
 }

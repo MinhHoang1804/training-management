@@ -1,5 +1,6 @@
 package com.g96.ftms.controller;
 
+import com.g96.ftms.dto.request.SessionRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.session.ISessionService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,12 @@ public class SessionController {
     }
 
     @GetMapping("/export-template")
-    public ResponseEntity<byte[]> exportTempalte() {
+    public ResponseEntity<byte[]> exportTemplate() {
         return sessionService.exportTemplate();
+    }
+
+    @PostMapping("/update-session")
+    public ApiResponse<?> updateSession(@RequestBody SessionRequest.SessionEditRequest model){
+        return sessionService.updateSessionUpdateSession(model);
     }
 }
