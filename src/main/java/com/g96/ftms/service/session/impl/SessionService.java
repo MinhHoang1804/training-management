@@ -10,14 +10,15 @@ import com.g96.ftms.repository.SubjectRepository;
 import com.g96.ftms.service.session.ISessionService;
 import com.g96.ftms.util.ExcelUltil;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,5 +71,65 @@ public class SessionService implements ISessionService {
         }
         workbook.close();
         return list;
+    }
+
+
+    public ResponseEntity<byte[]> exportSessionsToExcel(Long subjectId) {
+        // Lấy danh sách Session theo Subject ID
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        List<Session> sessions = subject.getSessionsList();
+
+        // Tạo Workbook và Sheet
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Sessions");
+
+            // Tạo tiêu đề cột
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Lesson", "Description", "Order"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(createHeaderStyle(workbook));
+            }
+
+            // Điền dữ liệu vào Sheet
+            for (int i = 0; i < sessions.size(); i++) {
+                Session session = sessions.get(i);
+                Row row = sheet.createRow(i + 1);
+                row.createCell(0).setCellValue(session.getLesson());
+                row.createCell(1).setCellValue(session.getDescription());
+                row.createCell(2).setCellValue(session.getSessionOrder());
+            }
+
+            // Tự động điều chỉnh kích thước cột
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Ghi dữ liệu ra mảng byte
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            byte[] excelBytes = outputStream.toByteArray();
+
+            // Trả file Excel dưới dạng ResponseEntity
+            HttpHeaders headersResponse = new HttpHeaders();
+            headersResponse.add("Content-Disposition", "attachment; filename=sessions.xlsx");
+            return ResponseEntity
+                    .ok()
+                    .headers(headersResponse)
+                    .body(excelBytes);
+
+        } catch (IOException e) {
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR,ErrorCode.EXPORT_FAILED);
+        }
+    }
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        return style;
     }
 }

@@ -5,6 +5,7 @@ import com.g96.ftms.service.session.ISessionService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,5 +21,10 @@ public class SessionController {
     @GetMapping("/by-subject/{subjectId}")
     public ApiResponse<?> getSubjectDetail(@PathVariable("subjectId") Long subjectId) {
         return sessionService.getSessionBySubjectId(subjectId);
+    }
+
+    @GetMapping("/export/{subjectId}")
+    public ResponseEntity<byte[]> exportSessions(@PathVariable("subjectId") Long subjectId) {
+        return sessionService.exportSessionsToExcel(subjectId);
     }
 }

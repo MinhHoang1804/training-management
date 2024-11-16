@@ -39,7 +39,8 @@ public enum ErrorCode {
     QUESTION_NOT_FOUND("ERR032","Không tìm thấy câu hỏi"),
     FEEDBACK_NOT_FOUND("ERR033","Không tìm thấy form feedback"),
     FILE_EMPTY("ERR034","File trống "),
-    FILE_WRONG_FORMAT("ERR035","File sai format");
+    FILE_WRONG_FORMAT("ERR035","File sai format"),
+    EXPORT_FAILED("ERR036","Đã có lỗi xảy ra");
     private final String code;
     private final String message;
 
