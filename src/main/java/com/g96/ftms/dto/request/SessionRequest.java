@@ -5,10 +5,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class SessionRequest {
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class SessionEditRequest{
+    public static class SessionAddRequest {
+        private Long subjectId;
+        private Integer sessionOrder;
+        private String lesson;
+        private String description;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SessionEditRequest {
         private Long sessionId;
         private Integer sessionOrder;
         private String lesson;

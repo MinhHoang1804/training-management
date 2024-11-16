@@ -20,4 +20,6 @@ public interface ISessionService {
     ResponseEntity<byte[]> exportTemplate();
 
     ApiResponse<?> updateSessionUpdateSession(SessionRequest.SessionEditRequest model);
+
+    ApiResponse<?> createSessionUpdateSession(SessionRequest.SessionAddRequest model);
 }

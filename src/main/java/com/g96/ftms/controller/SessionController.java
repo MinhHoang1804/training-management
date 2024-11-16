@@ -38,4 +38,9 @@ public class SessionController {
     public ApiResponse<?> updateSession(@RequestBody SessionRequest.SessionEditRequest model){
         return sessionService.updateSessionUpdateSession(model);
     }
+
+    @PostMapping("/add-session")
+    public ApiResponse<?> addSession(@RequestBody SessionRequest.SessionAddRequest model){
+        return sessionService.createSessionUpdateSession(model);
+    }
 }

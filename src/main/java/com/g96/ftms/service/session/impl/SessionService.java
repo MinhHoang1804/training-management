@@ -176,6 +176,16 @@ public class SessionService implements ISessionService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
 
+    @Override
+    public ApiResponse<?> createSessionUpdateSession(SessionRequest.SessionAddRequest model) {
+        Subject subject = subjectRepository.findById(model.getSubjectId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        Session map = mapper.map(model, Session.class);
+        map.setSubject(subject);
+        sessionRepository.save(map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+    }
+
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
