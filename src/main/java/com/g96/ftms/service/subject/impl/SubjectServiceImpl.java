@@ -2,29 +2,34 @@ package com.g96.ftms.service.subject.impl;
 
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
+import com.g96.ftms.dto.request.TraineeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SchemeResponse;
+import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
+import com.g96.ftms.entity.*;
 import com.g96.ftms.entity.Class;
-import com.g96.ftms.entity.CurriculumSubjectRelation;
-import com.g96.ftms.entity.MarkScheme;
-import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
-import com.g96.ftms.repository.ClassRepository;
-import com.g96.ftms.repository.CurriculumRepository;
-import com.g96.ftms.repository.SchemeRepository;
-import com.g96.ftms.repository.SubjectRepository;
+import com.g96.ftms.repository.*;
 import com.g96.ftms.service.subject.ISubjectService;
+import com.g96.ftms.util.ExcelUltil;
 import com.g96.ftms.util.SqlBuilderUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,6 +44,8 @@ public class SubjectServiceImpl implements ISubjectService {
     private final SchemeRepository schemeRepository;
     private final ClassRepository classRepository;
     private final ModelMapper mapper;
+
+    private final SessionRepository sessionRepository;
 
     @Override
     public ApiResponse<PagedResponse<Subject>> search(SubjectRequest.SubjectPagingRequest model) {
@@ -115,6 +122,12 @@ public class SubjectServiceImpl implements ISubjectService {
         }).collect(Collectors.toList());
         //create scheme
         schemeRepository.saveAll(schemeList);
+
+        //save lesson
+        List<SubjectRequest.SubjectLessonRequest> lessonList = model.getLessonList();
+       List<Session> sessionList= mapper.map(lessonList,new TypeToken<List<Session>>() {
+        }.getType());
+        sessionRepository.saveAll(sessionList);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }
 
@@ -132,4 +145,42 @@ public class SubjectServiceImpl implements ISubjectService {
         return c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
     }
 
+    @Override
+    public ApiResponse<List<SessionResponse.SessionInfoDTO>> importExcelFile(MultipartFile file) {
+        try {
+            List<SessionResponse.SessionInfoDTO> sessionInfoDTOS = readExcelFile(file);
+            return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), sessionInfoDTOS);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_WRONG_FORMAT);
+    }
+
+    private List<SessionResponse.SessionInfoDTO> readExcelFile(MultipartFile file) throws IOException {
+        List<SessionResponse.SessionInfoDTO> list = new ArrayList<>();
+
+        // Mở file Excel
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0); // Đọc sheet đầu tiên
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row != null) {
+                String lesson = ExcelUltil.getCellValueAsString(row.getCell(0));  // cột lesson
+                String description = ExcelUltil.getCellValueAsString(row.getCell(1));  // cột description
+                String sessionOrder = ExcelUltil.getCellValueAsString(row.getCell(2));  // cột sessionOrder
+                if(lesson!=null||description!=null||sessionOrder!=null){
+                SessionResponse.SessionInfoDTO item= SessionResponse.SessionInfoDTO.builder()
+                        .sessionOrder(Integer.valueOf(sessionOrder))
+                        .lesson(lesson)
+                        .description(description)
+                        .build();
+                list.add(item);
+
+                }
+            }
+        }
+        workbook.close();
+        return list;
+    }
 }

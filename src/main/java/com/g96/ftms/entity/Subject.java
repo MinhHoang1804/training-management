@@ -58,7 +58,7 @@ public class Subject {
 
 
     @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
-    private List<Grade> grades;
+    private List<Session> sessionsList;
 
     @OneToMany(mappedBy = "subject",fetch = FetchType.LAZY)
     @JsonBackReference

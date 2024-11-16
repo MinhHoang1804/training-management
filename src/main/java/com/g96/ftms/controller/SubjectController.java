@@ -4,8 +4,11 @@ import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.service.subject.ISubjectService;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/subject")
@@ -36,7 +39,7 @@ public class SubjectController {
         return subjectService.getSubjectDetail(subjectId);
     }
 
-    @PostMapping
+    @PostMapping("/add-subject")
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ApiResponse<Subject> addSubject(@RequestBody SubjectRequest.SubjectAddRequest model) {
         return subjectService.addSubject(model);
@@ -46,5 +49,10 @@ public class SubjectController {
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ApiResponse<Subject> updateSubject(@RequestBody SubjectRequest.SubjectEditRequest model) {
         return subjectService.updateSubject(model);
+    }
+
+    @PostMapping(value = "/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<?> importSession(@Parameter(description = "File Excel to upload") @RequestParam("file") MultipartFile file) {
+        return subjectService.importExcelFile(file);
     }
 }

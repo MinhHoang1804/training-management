@@ -19,15 +19,24 @@ public class SubjectRequest {
     public static class SubjectAddRequest{
         private String subjectName;
         private String subjectCode;
-        private String documentLink;
+//        private String documentLink;
         private String descriptions;
         private boolean status;
         List<SchemeResponse.SubjectSchemeInfo>schemes;
+        List<SubjectLessonRequest>lessonList;
     }
     @Data
     @NoArgsConstructor
     public static class SubjectEditRequest extends SubjectAddRequest{
         private Long id;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class SubjectLessonRequest{
+        private String lesson;
+        private Integer sessionOrder;
+        private String description;
     }
 
 }

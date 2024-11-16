@@ -70,7 +70,7 @@ public class TraineeSerivce implements ITraineeService {
             userClassRelationRepository.saveAll(userClassRelationList);
             return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
         }catch (Exception e){
-            return new ApiResponse<>(ErrorCode.BAD_REQUEST.getCode(), ErrorCode.BAD_REQUEST.getMessage(), ErrorCode.FILE_WRONG_FORMAT);
+            throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_WRONG_FORMAT);
         }
     }
 
