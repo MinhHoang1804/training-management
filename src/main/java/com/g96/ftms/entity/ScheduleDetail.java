@@ -34,9 +34,6 @@ public class ScheduleDetail {
     private String description;
 
     @Column
-    private String trainer;
-
-    @Column
     private LocalDateTime startTime;
 
     @Column
@@ -47,6 +44,9 @@ public class ScheduleDetail {
 
     @Column
     private Boolean status;
+
+    @Column
+    private Integer slot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id")

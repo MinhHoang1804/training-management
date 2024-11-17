@@ -1,6 +1,7 @@
 package com.g96.ftms.controller;
 
 import com.g96.ftms.dto.request.ClassRequest;
+import com.g96.ftms.dto.request.TrainerRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.classes.IClassService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,10 @@ public class ClassController {
     @PostMapping("/add")
     public ApiResponse<?> addClass(@RequestBody ClassRequest.ClassAddRequest model) {
         return classService.addClass(model);
+    }
+
+    @PostMapping("/get-trainer-class")
+    public ApiResponse<?> getTrainerByClass(@RequestBody TrainerRequest.TrainerForClassRequest model) {
+        return classService.getTrainerForClass(model);
     }
 }

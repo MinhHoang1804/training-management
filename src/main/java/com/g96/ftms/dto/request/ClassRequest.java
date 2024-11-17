@@ -26,4 +26,5 @@ public class ClassRequest {
         private LocalDateTime startDate;
         private Integer planTraineeNo;
     }
+
 }
