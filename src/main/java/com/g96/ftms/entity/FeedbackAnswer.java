@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "feedback_answer")
+@Table(name = "feedback_answers")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

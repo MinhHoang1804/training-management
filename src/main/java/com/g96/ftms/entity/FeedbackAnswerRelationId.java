@@ -14,8 +14,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FeedbackAnswerRelationId implements Serializable {
     @Column(name = "question_id")
-    private Long questionId;
+    public Long questionId;
 
     @Column(name = "feedback_id")
-    private Long feedbackId;
+    public Long feedbackId;
 }

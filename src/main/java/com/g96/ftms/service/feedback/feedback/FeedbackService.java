@@ -95,7 +95,7 @@ public class FeedbackService implements IFeedBackService {
                 .subject(subject).user(user).classs(aClass)
                 .description(model.getDescription())
                 .openTime(model.getOpenTime())
-                .feedBackDate(model.getFeedBackDate())
+                .feedbackDate(model.getFeedBackDate())
                 .build();
         feedBackRepository.save(feedBack);
         //save feedback
@@ -106,6 +106,11 @@ public class FeedbackService implements IFeedBackService {
             listFeedBack.add(feedbackAnswer);
         }
         feedBackAnswerRepository.saveAll(listFeedBack);
+
+        //update avg setting;
+        Double averageRatingByFeedbackId = feedBackAnswerRepository.findAverageRatingByFeedbackId(feedBack.getFeedbackId());
+        feedBack.setAvgRating(averageRatingByFeedbackId);
+        feedBackRepository.save(feedBack);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), feedBack);
     }
 
@@ -126,6 +131,10 @@ public class FeedbackService implements IFeedBackService {
             listFeedBack.add(feedbackAnswer);
         }
         feedBackAnswerRepository.saveAll(listFeedBack);
+        //save feedback avg
+        Double averageRatingByFeedbackId = feedBackAnswerRepository.findAverageRatingByFeedbackId(feedBack.getFeedbackId());
+        feedBack.setAvgRating(averageRatingByFeedbackId);
+        feedBackRepository.save(feedBack);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), fSave);
     }
 
@@ -155,10 +164,19 @@ public class FeedbackService implements IFeedBackService {
     }
 
     private FeedbackAnswer fillAnswerFeedBack(Questions question, FeedBack feedBack, String answer) {
+        // Khởi tạo khóa chính tổng hợp
+        FeedbackAnswerRelationId id = new FeedbackAnswerRelationId();
+        id.setQuestionId(question.getQuestionId());
+        id.setFeedbackId(feedBack.getFeedbackId());
+
+        // Khởi tạo FeedbackAnswer với khóa chính
         FeedbackAnswer feedbackAnswer = FeedbackAnswer.builder()
+                .id(id)
                 .feedback(feedBack)
                 .question(question)
                 .build();
+
+        // Xử lý giá trị câu trả lời dựa trên loại câu hỏi
         switch (question.getQuestionType()) {
             case RATING:
                 feedbackAnswer.setRating(Double.parseDouble(answer));
@@ -172,6 +190,8 @@ public class FeedbackService implements IFeedBackService {
             default:
                 throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.QUESTION_TYPE_WRONG_FORMAT);
         }
+
         return feedbackAnswer;
     }
+
 }

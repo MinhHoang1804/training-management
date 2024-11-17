@@ -1,6 +1,7 @@
 package com.g96.ftms.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.g96.ftms.dto.common.QuestionTypeConverter;
 import com.g96.ftms.util.constants.QuestionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class Questions {
     @Column(name = "question_text")
     private String questionText;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = QuestionTypeConverter.class)
     @Column(name = "question_type", columnDefinition = "ENUM('rating','yes_no','text')")
     private QuestionType questionType;
 

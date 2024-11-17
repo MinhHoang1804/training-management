@@ -29,8 +29,6 @@ public class FeedBackRequest {
     @AllArgsConstructor
     @Builder
     public static class FeedBackAddRequest {
-        private Long feedBackId;
-        private Long questionId;
         private Long classId;
         private Long subjectId;
         private Long userId;

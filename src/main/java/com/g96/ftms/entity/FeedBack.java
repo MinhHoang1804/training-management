@@ -28,8 +28,8 @@ public class FeedBack {
     @Column
     private Double avgRating=0.0;
 
-    @Column
-    private LocalDateTime feedBackDate;
+    @Column(name="feedback_date")
+    private LocalDateTime feedbackDate;
 
     @Column
     private LocalDateTime openTime;
