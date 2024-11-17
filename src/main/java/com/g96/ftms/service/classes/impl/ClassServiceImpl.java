@@ -74,6 +74,7 @@ public class ClassServiceImpl implements IClassService {
         Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
 
         Class map = mapper.map(model, Class.class);
+        map.setStatus(false); //send mail for cadmin
 
         Curriculum curriculum = curriculumRepository.findById(model.getCurriculumId())
                 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
@@ -84,8 +85,8 @@ public class ClassServiceImpl implements IClassService {
         List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
         List<Schedule> scheduleList = new ArrayList<>();
         for (Subject subject : subjectsInCurriculum) {
-            Schedule schedule = Schedule.builder().startTime(model.getStartDate()).endTime(model.getEndDate()).status(true)
-                    .classs(map).subject(subject).location(location).userId(user.getUserId()).description(model.getDescriptions()).build();
+            Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true)
+                    .classs(map).subject(subject).location(location).trainer(user.getAccount()).description(model.getDescription()).build();
             scheduleList.add(schedule);
         }
         //save scheduleList

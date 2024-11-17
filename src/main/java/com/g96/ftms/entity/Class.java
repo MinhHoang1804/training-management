@@ -43,6 +43,10 @@ public class Class {
     @Column
     private LocalDateTime startDate;
 
+
+    @Column(name="plan_Trainee_no")
+    private Integer planTraineeNo;
+
     @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
     @JsonBackReference
     List<Schedule> schedules;

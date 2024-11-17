@@ -12,53 +12,48 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "schedule")
+@Table(name = "schedule_detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Builder
-public class Schedule {
+public class ScheduleDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_id")
-    private Long scheduleId;
+    @Column(name = "schedule_detail_id")
+    private Long scheduleDetailId;
 
     @Column
-    private LocalDateTime startDate;
+    private String lesson;
 
     @Column
-    private LocalDateTime endDate;
-
-    @Column
-    private Boolean status;
-
-    @Column
-    private String trainer;
-
+    private Long sessionId;
 
     @Column
     private String description;
 
     @Column
-    private Integer slot;
+    private String trainer;
+
+    @Column
+    private LocalDateTime startTime;
+
+    @Column
+    private LocalDateTime endTime;
+
+    @Column
+    private LocalDateTime date;
+
+    @Column
+    private Boolean status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "schedule_id")
     @JsonBackReference
-    private Location location;
+    private Schedule schedule;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subject_id")
+    @OneToMany(mappedBy = "scheduleDetail", fetch = FetchType.LAZY)
     @JsonBackReference
-    private Subject subject;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id")
-    @JsonBackReference
-    private Class classs;
-
-    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
-    @JsonBackReference
-    List<ScheduleDetail> scheduleDetailList;
+    List<Attendance> adAttendanceList;
 }

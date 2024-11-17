@@ -20,9 +20,10 @@ public class ClassRequest {
         private Long locationId;
         private Long curriculumId;
         private String admin;
-        private String descriptions;
-        private Boolean status;
+        private String description;
+//        private Boolean status;
         private LocalDateTime endDate ;
         private LocalDateTime startDate;
+        private Integer planTraineeNo;
     }
 }
