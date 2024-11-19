@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,23 +22,36 @@ public class ScheduleService implements IScheduleService {
     private final ModelMapper mapper;
 
     @Override
-    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate, List<Session> sessions) {
-        List<ScheduleResponse.ScheDuleDetailsInfo> list=new ArrayList<>();
+    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate,Integer slot, List<Session> sessions) {
+        List<ScheduleResponse.ScheDuleDetailsInfo> list = new ArrayList<>();
         LocalDate currentDate = startDate;
+
         for (Session session : sessions) {
-            // Bỏ qua ngày cuối tuần
+            // Skip weekends
             while (currentDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
                     currentDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 currentDate = currentDate.plusDays(1);
             }
+
+            // Map session to ScheDuleDetailsInfo
             ScheduleResponse.ScheDuleDetailsInfo map = mapper.map(session, ScheduleResponse.ScheDuleDetailsInfo.class);
-            map.setDate(currentDate);
-            // Thêm schedule detail vào danh sách kết quả
+
+            // Convert LocalDate to LocalDateTime
+            LocalDateTime dateTime = currentDate.atStartOfDay(); // Use start of the day
+            // Alternatively, set a custom time: currentDate.atTime(LocalTime.of(10, 0)); // 10:00 AM
+
+            map.setDate(dateTime); // Assuming your `ScheDuleDetailsInfo` has a LocalDateTime field `dateTime`
+
+            ScheduleResponse.TimeSlotInfo timeSlot = ScheduleResponse.TimeSlotInfo.getTimeSlot(slot);
+            map.setDate(timeSlot.getStartDate());
+            map.setEndDate(timeSlot.getEndDate());
+            // Add schedule detail to the result list
             list.add(map);
-            // Chuyển sang ngày tiếp theo
+            // Move to the next day
             currentDate = currentDate.plusDays(1);
         }
 
-        return new ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);
     }
+
 }

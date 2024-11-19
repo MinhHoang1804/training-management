@@ -14,4 +14,11 @@ public class ScheduleRequest {
         LocalDate startDate;
         List<Session> sessions;
     }
+    @Data
+    @NoArgsConstructor
+    public static class ScheduleGenerateDto {
+        LocalDate startDate;
+        Integer slot;
+        List<Session> sessions;
+    }
 }

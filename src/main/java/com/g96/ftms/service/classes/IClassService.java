@@ -20,4 +20,8 @@ public interface IClassService {
     ApiResponse<?> addClass(ClassRequest.ClassAddRequest model);
 
     ApiResponse<List<TrainerResponse.TrainerInfoDTO>> getTrainerForClass(TrainerRequest.TrainerForClassRequest model);
+
+    ApiResponse<?> updateClassByAdmin(ClassRequest.UpdateClassByAdminForm model);
+
+    ApiResponse<?> acceptClass(ClassRequest.UpdateStatusClassFrom model);
 }

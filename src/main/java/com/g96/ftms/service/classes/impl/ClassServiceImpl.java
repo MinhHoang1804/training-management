@@ -5,6 +5,7 @@ import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.request.TrainerRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.ClassReponse;
+import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.dto.response.TrainerResponse;
 import com.g96.ftms.entity.*;
 import com.g96.ftms.entity.Class;
@@ -12,6 +13,7 @@ import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.classes.IClassService;
+import com.g96.ftms.service.schedule.IScheduleService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -35,7 +37,8 @@ public class ClassServiceImpl implements IClassService {
     private final ScheduleRepository scheduleRepository;
     private final LocationRepository locationRepository;
     private final CurriculumRepository curriculumRepository;
-
+    private final IScheduleService scheduleService;
+    private final ScheduleDetailRepository scheduleDetailRepository;
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
@@ -55,6 +58,7 @@ public class ClassServiceImpl implements IClassService {
 
         Class c = classRepository.findById(classId).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+
         ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
@@ -73,8 +77,6 @@ public class ClassServiceImpl implements IClassService {
         if (user == null) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
         }
-        //check location Exist
-        Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
 
         Class map = mapper.map(model, Class.class);
         map.setStatus(false); //send mail for cadmin
@@ -85,15 +87,16 @@ public class ClassServiceImpl implements IClassService {
         //save entity
         Class classSave = classRepository.save(map);
         //create schedule
-        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
-        List<Schedule> scheduleList = new ArrayList<>();
-        for (Subject subject : subjectsInCurriculum) {
-            Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true)
-                    .classs(map).subject(subject).location(location).trainer(user.getAccount()).description(model.getDescription()).build();
-            scheduleList.add(schedule);
-        }
+//        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
+//        List<Schedule> scheduleList = new ArrayList<>();
+//        for (Subject subject : subjectsInCurriculum) {
+//            Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true)
+//                    .classs(map).subject(subject).location(location).trainer(user.getAccount()).description(model.getDescription()).build();
+//            scheduleList.add(schedule);
+//        }
         //save scheduleList
-        scheduleRepository.saveAll(scheduleList);
+//        scheduleRepository.saveAll(scheduleList);
+        //generate schedule
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), classSave);
     }
 
@@ -102,9 +105,74 @@ public class ClassServiceImpl implements IClassService {
         //get list trainer inrange
         List<String> traineeUnAvailable = scheduleRepository.findTraineesInRangeAndSlot(model.getSlot(), model.getStartDate(), model.getEndDate());
 
-        List<User> roleTrainer = userRepository.findByRoleAvail("ROLE_TRAINER",traineeUnAvailable);
-        List<TrainerResponse.TrainerInfoDTO> trainerList=mapper.map(roleTrainer, new TypeToken<List<TrainerResponse.TrainerInfoDTO>>() {
+        List<User> roleTrainer = userRepository.findByRoleAvail("ROLE_TRAINER", traineeUnAvailable);
+        List<TrainerResponse.TrainerInfoDTO> trainerList = mapper.map(roleTrainer, new TypeToken<List<TrainerResponse.TrainerInfoDTO>>() {
         }.getType());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), trainerList);
     }
+
+    @Override
+    @Transactional
+    public ApiResponse<?> updateClassByAdmin(ClassRequest.UpdateClassByAdminForm model) {
+        Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+
+        //check location Exist
+        Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
+        //create schedule
+        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
+        List<Schedule> scheduleList = new ArrayList<>();
+        for (Subject subject : subjectsInCurriculum) {
+
+            ClassRequest.SubjectTraineeDto cs = model.getSubjectList().stream()
+                    .filter(s -> subject.getSubjectId().equals(s.getSubjectId())) // Assuming subjectId is a variable
+                    .findFirst()
+                    .orElse(null); // Returns null if no match is found
+
+            ClassRequest.SubjectTraineeDto cst = model.getSubjectList().stream()
+                    .filter(a -> subject.getSubjectId().equals(a.getSubjectId())) // Replace `subjectId` with the desired ID to match
+                    .findFirst()
+                    .orElse(null); // Return null if no match is found
+
+            Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true)
+                    .classs(c).subject(subject).location(location).trainer(cst.getTrainer()).description(model.getDescription()).build();
+            scheduleList.add(schedule);
+        }
+//        save scheduleList
+        List<Schedule> schedules = scheduleRepository.saveAll(scheduleList);
+        List<ClassRequest.SubjectSessionDto> subjectSessionList = model.getSubjectSessionList();
+        List<ScheduleDetail>scheduleDetailList=new ArrayList<>();
+        for(Schedule schedule : schedules) {
+            ClassRequest.SubjectSessionDto subjectSessionDto = subjectSessionList.stream().filter(s -> s.getSubjectId() == schedule.getSubject().getSubjectId()).findFirst().orElse(null);
+            if(subjectSessionDto == null) {
+                List<ScheduleDetail> list = subjectSessionDto.getSessionList().stream().map(s -> {
+                    ScheduleDetail scheduleDetail = ScheduleDetail.builder()
+                            .sessionId(s.getSessionId())
+                            .schedule(schedule)
+                            .date(s.getDate())
+                            .lesson(s.getLesson())
+                            .status(false)
+                            .startTime(s.getStartDate())
+                            .endTime(s.getEndDate())
+                            .slot(schedule.getSlot())
+                            .description(s.getDescription())
+                            .build();
+                    return scheduleDetail;
+                }).toList();
+                scheduleDetailList.addAll(list);
+            }
+        }
+        scheduleDetailRepository.saveAll(scheduleDetailList);
+
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), c);
+    }
+
+    @Override
+    public ApiResponse<?> acceptClass(ClassRequest.UpdateStatusClassFrom model) {
+        Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        c.setStatus(true);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), c);
+    }
+
 }
