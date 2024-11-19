@@ -144,4 +144,31 @@ public class EmailServiceImpl implements EmailService {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST);
         }
     }
+
+    public void sendMailToAcceptRequest(String senderName, String senderToEmail, String fullName, String className, Long classId){
+        if (senderToEmail == null || senderToEmail.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.EMPTY_INPUT);
+        }
+        if (!isValidEmail(senderToEmail)) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_EMAIL);
+        }
+        String link = "http://localhost:8080/api/v1/class-management/detail/" + classId;
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setTo(senderToEmail);
+            helper.setSubject("Request create class");
+            String htmlContent = ClassCreateTemplate.generateClassRequestAcceptEmailTemplate(fullName, className, link);
+
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST);
+        }
+    }
+
+
 }

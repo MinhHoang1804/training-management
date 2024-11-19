@@ -29,4 +29,18 @@ public class ClassCreateTemplate {
                 "</html>";
     }
 
+
+    public static String generateClassRequestAcceptEmailTemplate(String recipientName, String className, String detailLink) {
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<body style='font-family:Arial, sans-serif; line-height:1.6;'>" +
+                "<p>Dear " + recipientName + ",</p>" +
+                "<p>Lớp <strong>" + className + "</strong> đang chờ anh/chị review.</p>" +
+                "<p>Để xem thông tin chi tiết lớp học, vui lòng <a href='" + detailLink + "' style='color:blue; text-decoration:none;'>bấm vào đây</a>.</p>" +
+                "<br>" +
+                "<p>Trân trọng,</p>" +
+                "<p><strong>FAMS Team</strong></p>" +
+                "</body>" +
+                "</html>";
+    }
 }

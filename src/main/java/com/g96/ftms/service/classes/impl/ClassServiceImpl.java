@@ -41,6 +41,7 @@ public class ClassServiceImpl implements IClassService {
     private final IScheduleService scheduleService;
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final EmailService emailService;
+
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
@@ -89,7 +90,11 @@ public class ClassServiceImpl implements IClassService {
         //save entity
         Class classSave = classRepository.save(map);
 
-        emailService.sendMailForCreateClassRequest("Admin",user.getEmail(),user.getFullName(),map.getClassCode(),map.getClassId());
+        try {
+        emailService.sendMailForCreateClassRequest("Admin", user.getEmail(), user.getFullName(), map.getClassCode(), map.getClassId());
+        }catch (Exception e){
+            e.printStackTrace();;
+        }
         //create schedule
 //        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
 //        List<Schedule> scheduleList = new ArrayList<>();
@@ -120,6 +125,7 @@ public class ClassServiceImpl implements IClassService {
     public ApiResponse<?> updateClassByAdmin(ClassRequest.UpdateClassByAdminForm model) {
         Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        User user = userRepository.findByAccount(c.getAdmin());
 
         //check location Exist
         Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
@@ -145,10 +151,10 @@ public class ClassServiceImpl implements IClassService {
 //        save scheduleList
         List<Schedule> schedules = scheduleRepository.saveAll(scheduleList);
         List<ClassRequest.SubjectSessionDto> subjectSessionList = model.getSubjectSessionList();
-        List<ScheduleDetail>scheduleDetailList=new ArrayList<>();
-        for(Schedule schedule : schedules) {
+        List<ScheduleDetail> scheduleDetailList = new ArrayList<>();
+        for (Schedule schedule : schedules) {
             ClassRequest.SubjectSessionDto subjectSessionDto = subjectSessionList.stream().filter(s -> s.getSubjectId() == schedule.getSubject().getSubjectId()).findFirst().orElse(null);
-            if(subjectSessionDto == null) {
+            if (subjectSessionDto == null) {
                 List<ScheduleDetail> list = subjectSessionDto.getSessionList().stream().map(s -> {
                     ScheduleDetail scheduleDetail = ScheduleDetail.builder()
                             .sessionId(s.getSessionId())
@@ -167,7 +173,11 @@ public class ClassServiceImpl implements IClassService {
             }
         }
         scheduleDetailRepository.saveAll(scheduleDetailList);
-
+        try {
+            emailService.sendMailToAcceptRequest("Admin", user.getEmail(), user.getFullName(), c.getClassCode(), c.getClassId());
+        } catch (Exception E) {
+            E.printStackTrace();
+        }
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), c);
     }
 
