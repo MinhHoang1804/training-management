@@ -13,4 +13,6 @@ public interface EmailService {
     boolean isValidEmail(String email);
 
     boolean isPasswordValid(String password);
+
+    void sendMailForCreateClassRequest(String senderName, String senderToEmail, String fullName, String className, Long classId);
 }

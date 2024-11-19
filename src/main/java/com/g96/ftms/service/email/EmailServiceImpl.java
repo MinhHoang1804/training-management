@@ -6,6 +6,7 @@ import com.g96.ftms.entity.User;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.UserRepository;
+import com.g96.ftms.util.ClassCreateTemplate;
 import com.g96.ftms.util.EmailTemplate;
 import com.g96.ftms.util.VerificationCodeUtil;
 import jakarta.mail.MessagingException;
@@ -116,5 +117,31 @@ public class EmailServiceImpl implements EmailService {
                 password.matches(".*[a-z].*") &&
                 password.matches(".*\\d.*") &&
                 password.matches(".*[^a-zA-Z0-9].*");
+    }
+
+    @Override
+    public void sendMailForCreateClassRequest(String senderName, String senderToEmail, String fullName, String className, Long classId) {
+        if (senderToEmail == null || senderToEmail.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.EMPTY_INPUT);
+        }
+        if (!isValidEmail(senderToEmail)) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_EMAIL);
+        }
+        String link = "http://localhost:8080/api/v1/class-management/detail/" + classId;
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setTo(senderToEmail);
+            helper.setSubject("Request create class");
+             String htmlContent = ClassCreateTemplate.generateClassRequestEmailTemplate(fullName, className, link, senderName);
+
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST);
+        }
     }
 }

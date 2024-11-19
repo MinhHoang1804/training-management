@@ -13,6 +13,7 @@ import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.classes.IClassService;
+import com.g96.ftms.service.email.EmailService;
 import com.g96.ftms.service.schedule.IScheduleService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class ClassServiceImpl implements IClassService {
     private final CurriculumRepository curriculumRepository;
     private final IScheduleService scheduleService;
     private final ScheduleDetailRepository scheduleDetailRepository;
+    private final EmailService emailService;
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
@@ -86,6 +88,8 @@ public class ClassServiceImpl implements IClassService {
         map.setCurriculum(curriculum);
         //save entity
         Class classSave = classRepository.save(map);
+
+        emailService.sendMailForCreateClassRequest("Admin",user.getEmail(),user.getFullName(),map.getClassCode(),map.getClassId());
         //create schedule
 //        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
 //        List<Schedule> scheduleList = new ArrayList<>();
