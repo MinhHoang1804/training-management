@@ -17,6 +17,7 @@ import com.g96.ftms.mapper.Mapper;
 import com.g96.ftms.repository.RoleRepository;
 import com.g96.ftms.repository.UserRepository;
 import com.g96.ftms.security.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -239,4 +240,28 @@ public class UserServiceImpl implements UserService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
+    @Override
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            // Lấy thời gian hết hạn của token
+            long expirationTime = jwtTokenProvider.getExpirationDateFromToken(token) - System.currentTimeMillis();
+
+            // Thêm token vào danh sách thu hồi
+            tokenStore.revokeToken(token, expirationTime);
+
+            return ResponseEntity.ok("Logout successful");
+        } else {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 }
