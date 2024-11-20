@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final ModelMapper mapper;
+
     @Override
     public User findByAccount(String account) {
         return userRepository.findByAccount(account);
@@ -188,7 +189,7 @@ public class UserServiceImpl implements UserService {
 
         int targetUserLevel = user.getHighestRoleLevel();
 
-        if (userRoleLevels.isPresent()&& userRoleLevels.get() <= targetUserLevel) {
+        if (userRoleLevels.isPresent() && userRoleLevels.get() <= targetUserLevel) {
             return Mapper.mapEntityToDto(user, UserDTO.class);
         }
 
@@ -228,7 +229,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model) {
-        Page<User> pages = userRepository.searchFilter(model.getKeyword(), model.getStatus(), model.getPageable());
+        Page<User> pages = userRepository.searchFilter(model.getKeyword(), model.getStatus(), model.getRoleId(), model.getPageable());
         List<UserResponse.UserInfoDTO> list = pages.getContent().stream().map(item -> {
             UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
             map.setRole(item.getRole());
