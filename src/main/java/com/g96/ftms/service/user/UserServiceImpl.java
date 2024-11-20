@@ -240,22 +240,22 @@ public class UserServiceImpl implements UserService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
-    @Override
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            // Lấy thời gian hết hạn của token
-            long expirationTime = jwtTokenProvider.getExpirationDateFromToken(token) - System.currentTimeMillis();
-
-            // Thêm token vào danh sách thu hồi
-            tokenStore.revokeToken(token, expirationTime);
-
-            return ResponseEntity.ok("Logout successful");
-        } else {
-            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_TOKEN);
-        }
-    }
+//    @Override
+//    public ResponseEntity<?> logout(HttpServletRequest request) {
+//        String token = jwtTokenProvider.resolveToken(request);
+//
+//        if (token != null && jwtTokenProvider.validateToken(token)) {
+//            // Lấy thời gian hết hạn của token
+//            long expirationTime = jwtTokenProvider.getExpirationDateFromToken(token) - System.currentTimeMillis();
+//
+//            // Thêm token vào danh sách thu hồi
+//            tokenStore.revokeToken(token, expirationTime);
+//
+//            return ResponseEntity.ok("Logout successful");
+//        } else {
+//            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_TOKEN);
+//        }
+//    }
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
