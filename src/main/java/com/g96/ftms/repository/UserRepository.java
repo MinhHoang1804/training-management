@@ -29,11 +29,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u JOIN u.userClassRelationList r WHERE r.classs.classId = :classId")
     Page<User> findUsersByClassId(@Param("classId") Long classId, Pageable pageable);
 
-    @Query("SELECT u FROM User u WHERE " +
+    @Query("SELECT u FROM User u " +
+            "INNER JOIN U.roles r " +
+            "WHERE " +
             "(:keywordFilter IS NULL OR (u.account LIKE :keywordFilter OR u.email LIKE :keywordFilter OR u.phone LIKE :keywordFilter)) " +
-            "AND (:status IS NULL OR u.status= :status) ")
+            "AND (:status IS NULL OR u.status= :status) "+
+            "AND (:roleId IS NULL OR r.roleId =:roleId)")
     Page<User> searchFilter(@Param("keywordFilter") String keywordFilter,
                             @Param("status") Boolean status,
+                            @Param("roleId") Long roleId,
                             Pageable pageable);
 
     @Query("SELECT u FROM User u JOIN u.roles r " +

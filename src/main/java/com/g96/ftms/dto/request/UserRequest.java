@@ -10,5 +10,6 @@ public class UserRequest {
     public static class UserPagingRequest extends PagingBaseParams {
         private String keyword;
         private Boolean status;
+        private Long roleId;
     }
 }
