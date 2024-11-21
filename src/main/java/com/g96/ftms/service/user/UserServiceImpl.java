@@ -230,7 +230,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model) {
-        Page<User> pages = userRepository.searchFilter(model.getKeyword(), model.getStatus(), model.getRoleId(), model.getPageable());
+        String keywordFilter= model.getKeyword()==null?null:"%"+ model.getKeyword()+"%";
+        Page<User> pages = userRepository.searchFilter(keywordFilter, model.getStatus(), model.getRoleId(), model.getPageable());
         List<UserResponse.UserInfoDTO> list = pages.getContent().stream().map(item -> {
             UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
             map.setRole(item.getRole());
