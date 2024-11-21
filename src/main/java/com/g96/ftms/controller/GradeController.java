@@ -26,12 +26,17 @@ public class GradeController {
         return gradeService.getSubjectGradeDetail(model);
     }
 
+    @PostMapping("/add-grade-trainee")
+    public ApiResponse<?> addGrade(@RequestBody GradeRequest.GradedSubjectAddRequest model) {
+        return gradeService.addGradeForTrainee(model);
+    }
+
     @PostMapping("/save-grade-setting")
     public ApiResponse<?> saveGradeSetting(@RequestBody GradeRequest.GradeSettingUpdateRequest model) {
         return gradeService.saveGradeSetting(model);
     }
 
-    @PostMapping("/scheme-in-subject-class")
+    @PostMapping("/get-scheme-in-subject-class")
     public ApiResponse<?> getSchemeInSubjectClass(@RequestBody SchemeRequest.SchemeClassSubjectRequest model) {
         return markSchemeService.getSchemeInSubjectClass(model);
     }

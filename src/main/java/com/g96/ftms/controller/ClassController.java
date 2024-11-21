@@ -27,6 +27,12 @@ public class ClassController {
         return classService.getClassDetail(classId);
     }
 
+    @GetMapping("/get-trainee-in-class/{id}")
+    public ApiResponse<?> getTraineeInClass(@PathVariable("id") Long classId) {
+        return classService.getTraineeForClass(classId);
+    }
+
+
     @PostMapping("/info-trainee/{id}")
     public ApiResponse<?> getInfoForTrainee(@PathVariable("id") Long classId) {
         return classService.getClassForTrainee(classId);
@@ -37,8 +43,8 @@ public class ClassController {
         return classService.addClass(model);
     }
 
-    @PostMapping("/get-trainer-class")
-    public ApiResponse<?> getTrainerByClass(@RequestBody TrainerRequest.TrainerForClassRequest model) {
+    @PostMapping("/get-trainer-for-class")
+    public ApiResponse<?> getTrainerForClass(@RequestBody TrainerRequest.TrainerForClassRequest model) {
         return classService.getTrainerForClass(model);
     }
     //s

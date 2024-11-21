@@ -26,6 +26,15 @@ public class GradeRequest {
     }
     @Data
     @NoArgsConstructor
+    public static class GradedSubjectAddRequest {
+        private String user;
+        private Long classId;
+        private Long subjectId;
+        private Long markSchemeId;
+        private Double grade;
+    }
+    @Data
+    @NoArgsConstructor
     public static class GradeSettingUpdateRequest {
        List<GradeSettingUpdateInfo> schemes;
     }

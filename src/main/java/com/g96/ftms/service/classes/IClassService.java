@@ -24,4 +24,6 @@ public interface IClassService {
     ApiResponse<?> updateClassByAdmin(ClassRequest.UpdateClassByAdminForm model);
 
     ApiResponse<?> acceptClass(ClassRequest.UpdateStatusClassFrom model);
+
+    ApiResponse<?> getTraineeForClass(Long classId);
 }

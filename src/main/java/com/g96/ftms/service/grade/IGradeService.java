@@ -11,4 +11,6 @@ public interface IGradeService {
     ApiResponse<GradeResponse.GradeSubjectSchemeDetail> getSubjectGradeDetail(GradeRequest.GradedSubjectRequest model);
 
     ApiResponse<?> saveGradeSetting(GradeRequest.GradeSettingUpdateRequest model);
+
+    ApiResponse<?> addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model);
 }

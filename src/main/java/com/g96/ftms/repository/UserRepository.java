@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findByAccountNotInAndRoles_RoleName(Collection<String> accounts, String roleName);
 
     User findByAccount(String account);
 
@@ -28,6 +27,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN u.userClassRelationList r WHERE r.classs.classId = :classId")
     Page<User> findUsersByClassId(@Param("classId") Long classId, Pageable pageable);
+    @Query("SELECT u FROM User u JOIN u.userClassRelationList r WHERE r.classs.classId = :classId")
+    List<User> findUsersByClassId(@Param("classId") Long classId);
 
     @Query("SELECT u FROM User u JOIN u.roles r " +
             " WHERE " +

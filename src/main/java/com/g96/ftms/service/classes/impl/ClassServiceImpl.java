@@ -187,4 +187,10 @@ public class ClassServiceImpl implements IClassService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), c);
     }
 
+    @Override
+    public ApiResponse<?> getTraineeForClass(Long classId) {
+        List<User> list = userRepository.findUsersByClassId(classId);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);
+    }
+
 }

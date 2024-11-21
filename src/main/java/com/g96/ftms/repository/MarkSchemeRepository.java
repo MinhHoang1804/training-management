@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface MarkSchemeRepository extends JpaRepository<MarkScheme, Long> {
+    boolean existsByMarkSchemeIdAndSubject_SubjectId(Long markSchemeId, Long subjectId);
     List<MarkScheme> findBySubject_SubjectId(Long subjectId);
 }

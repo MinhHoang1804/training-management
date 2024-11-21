@@ -40,7 +40,9 @@ public enum ErrorCode {
     FEEDBACK_NOT_FOUND("ERR033","Không tìm thấy form feedback"),
     FILE_EMPTY("ERR034","File trống "),
     FILE_WRONG_FORMAT("ERR035","File sai format"),
-    EXPORT_FAILED("ERR036","Đã có lỗi xảy ra");
+    EXPORT_FAILED("ERR036","Đã có lỗi xảy ra"),
+    SCHEME_NOT_FOUND("ERR037","Không tìm thấy điểm thành phần"),
+    SCHEME_NOT_FOUND_IN_SUBJECT("ERR038","Không tìm thấy điểm thành phần này ở môn học");
     private final String code;
     private final String message;
 

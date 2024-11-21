@@ -3,7 +3,6 @@ package com.g96.ftms.service.grade.impl;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.GradeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
-import com.g96.ftms.dto.response.ClassReponse;
 import com.g96.ftms.dto.response.GradeResponse;
 import com.g96.ftms.entity.Class;
 import com.g96.ftms.entity.*;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,7 +91,39 @@ public class GradeService implements IGradeService {
         }
         //save new entity
         //remove all grade
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), null);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+    }
+
+    @Override
+    public ApiResponse<?> addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model) {
+        User user = userRepository.findByAccount(model.getUser());
+        if (user == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
+        }
+        MarkScheme markScheme = markSchemeRepository.findById(model.getMarkSchemeId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.SCHEME_NOT_FOUND));
+        Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        Subject subject = subjectRepository.findById(model.getSubjectId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        //check markschme in subject
+        if(!markSchemeRepository.existsByMarkSchemeIdAndSubject_SubjectId(markScheme.getMarkSchemeId(),subject.getSubjectId())){
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SCHEME_NOT_FOUND_IN_SUBJECT);
+        }
+        Grade map = mapper.map(model, Grade.class);
+        map.setMarkScheme(markScheme);
+        map.setClasss(c);
+        map.setUser(user);
+        map.setSubject(subject);
+
+        GradeId gradeId=GradeId.builder().classId(c.getClassId())
+                .markSchemeId(markScheme.getMarkSchemeId())
+                .userId(user.getUserId())
+                .subjectId(subject.getSubjectId())
+                .classId(c.getClassId())
+                .build();
+        map.setId(gradeId);
+        gradeRepository.save(map);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
     }
 
 
