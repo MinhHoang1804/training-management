@@ -134,27 +134,25 @@ public class ClassServiceImpl implements IClassService {
         List<Schedule> scheduleList = new ArrayList<>();
         for (Subject subject : subjectsInCurriculum) {
 
-            ClassRequest.SubjectTraineeDto cs = model.getSubjectList().stream()
-                    .filter(s -> subject.getSubjectId().equals(s.getSubjectId())) // Assuming subjectId is a variable
-                    .findFirst()
-                    .orElse(null); // Returns null if no match is found
-
             ClassRequest.SubjectTraineeDto cst = model.getSubjectList().stream()
                     .filter(a -> subject.getSubjectId().equals(a.getSubjectId())) // Replace `subjectId` with the desired ID to match
                     .findFirst()
                     .orElse(null); // Return null if no match is found
-
-            Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true)
-                    .classs(c).subject(subject).location(location).trainer(cst.getTrainer()).description(model.getDescription()).build();
-            scheduleList.add(schedule);
+            if(cst!=null){
+                Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true).slot(cst.getSlot())
+                        .classs(c).subject(subject).location(location).trainer(cst.getTrainer()).description(model.getDescription()).build();
+                scheduleList.add(schedule);
+            }
         }
 //        save scheduleList
         List<Schedule> schedules = scheduleRepository.saveAll(scheduleList);
+
+        //save schedule detail;
         List<ClassRequest.SubjectSessionDto> subjectSessionList = model.getSubjectSessionList();
         List<ScheduleDetail> scheduleDetailList = new ArrayList<>();
         for (Schedule schedule : schedules) {
             ClassRequest.SubjectSessionDto subjectSessionDto = subjectSessionList.stream().filter(s -> s.getSubjectId() == schedule.getSubject().getSubjectId()).findFirst().orElse(null);
-            if (subjectSessionDto == null) {
+            if (subjectSessionDto != null) {
                 List<ScheduleDetail> list = subjectSessionDto.getSessionList().stream().map(s -> {
                     ScheduleDetail scheduleDetail = ScheduleDetail.builder()
                             .sessionId(s.getSessionId())
