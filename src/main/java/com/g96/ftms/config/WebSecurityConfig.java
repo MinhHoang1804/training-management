@@ -54,6 +54,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/trainee/**").permitAll()
                         .requestMatchers("/api/v1/trainee/**").permitAll()
                         .requestMatchers("/api/v1/curriculums/**").permitAll()
+                        .requestMatchers("/api/v1/generation-management/**").permitAll()
                         .requestMatchers("/api/v1/curriculums/update/**").hasAnyRole("ADMIN", "COORDINATOR")
                         .anyRequest().authenticated()
                 )
