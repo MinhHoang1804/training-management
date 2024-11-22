@@ -90,6 +90,7 @@ public class SettingServiceImpl implements ISettingService {
     }
 
     @Override
+    @Transactional
     public ApiResponse<Settings> updateSetting(SettingRequest.SettingEditRequest model) {
         Settings setting = settingsRepository.findById(model.getId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SETTING_NOTFOUND));
         if (model.getStatus() != null) {
@@ -97,17 +98,18 @@ public class SettingServiceImpl implements ISettingService {
         }
         setting.setDescription(model.getDescription());
         //reset group;
-        if (setting.getGeneration() != null) {
-            setting.setGeneration(null);
-            settingsRepository.save(setting); //remove generation
-        }
-        if (setting.getLocation() != null) {
-            setting.setLocation(null);
-            settingsRepository.save(setting); //remove generation
-        }
+//        if (setting.getGeneration() != null) {
+//            setting.setGeneration(null);
+//            settingsRepository.save(setting); //remove generation
+//        }
+//        if (setting.getLocation() != null) {
+//            setting.setLocation(null);
+//            settingsRepository.save(setting); //remove generation
+//        }
 
         //update group
         if (model.getSettingGroup() == SettingGroupEnum.GENERATION) {
+
             //check generation exist
             Generation generation = setting.getGeneration();
             if(generationRepository.existsByGenerationNameAndGetGenerationIdNot(model.getSettingName(),generation.getGetGenerationId())){
@@ -117,9 +119,11 @@ public class SettingServiceImpl implements ISettingService {
                 }
                 Optional<Generation> byGenerationName = generationRepository.findByGenerationName(model.getSettingName());
                 if(byGenerationName.isPresent()){
+                    Generation newGê = byGenerationName.get();
                     setting.setDescription(model.getDescription());
                     setting.setGeneration(byGenerationName.get());
                     settingsRepository.save(setting);
+                    return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
                 }
             }
             //create new generation
@@ -142,6 +146,7 @@ public class SettingServiceImpl implements ISettingService {
                     setting.setLocation(byRoomName.get());
                     setting.setDescription(model.getDescription());
                     settingsRepository.save(setting);
+                    return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
                 }
             }
             //create new generation
