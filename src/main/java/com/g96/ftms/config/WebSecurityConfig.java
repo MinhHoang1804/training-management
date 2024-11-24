@@ -48,6 +48,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/session-management/**").permitAll()
                         .requestMatchers("/api/v1/user/search").permitAll()
                         .requestMatchers("/api/v1/feedback-management/**").permitAll()
+                        .requestMatchers("/api/v1/class-management/**").permitAll()
                         .requestMatchers("/api/v1/settings/**").permitAll()
                         .requestMatchers("/api/v1/grade-management/**").permitAll()
                         .requestMatchers("/api/v1/location-management/**").permitAll()

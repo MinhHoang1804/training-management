@@ -66,5 +66,8 @@ public class Class {
     @ManyToOne
     @JoinColumn(name = "curriculum_id")
     private Curriculum curriculum;
+    @ManyToOne
+    @JoinColumn(name = "generation_id")
+    private Generation generation;
 }
 

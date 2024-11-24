@@ -3,10 +3,7 @@ package com.g96.ftms.service.classes.impl;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.request.TrainerRequest;
-import com.g96.ftms.dto.response.ApiResponse;
-import com.g96.ftms.dto.response.ClassReponse;
-import com.g96.ftms.dto.response.SessionResponse;
-import com.g96.ftms.dto.response.TrainerResponse;
+import com.g96.ftms.dto.response.*;
 import com.g96.ftms.entity.*;
 import com.g96.ftms.entity.Class;
 import com.g96.ftms.exception.AppException;
@@ -14,6 +11,7 @@ import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.classes.IClassService;
 import com.g96.ftms.service.email.EmailService;
+import com.g96.ftms.service.generation.IGenerationService;
 import com.g96.ftms.service.schedule.IScheduleService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +37,7 @@ public class ClassServiceImpl implements IClassService {
     private final LocationRepository locationRepository;
     private final CurriculumRepository curriculumRepository;
     private final IScheduleService scheduleService;
+    private final GenerationRepository generationRepository;
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final EmailService emailService;
 
@@ -91,9 +90,10 @@ public class ClassServiceImpl implements IClassService {
         Class classSave = classRepository.save(map);
 
         try {
-        emailService.sendMailForCreateClassRequest("Admin", user.getEmail(), user.getFullName(), map.getClassCode(), map.getClassId());
-        }catch (Exception e){
-            e.printStackTrace();;
+            emailService.sendMailForCreateClassRequest("Admin", user.getEmail(), user.getFullName(), map.getClassCode(), map.getClassId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            ;
         }
         //create schedule
 //        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
@@ -126,9 +126,13 @@ public class ClassServiceImpl implements IClassService {
         Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         User user = userRepository.findByAccount(c.getAdmin());
-
+        Generation generation = generationRepository.findById(model.getGenerationId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.GENERATION_NOT_FOUND));
+        c.setGeneration(generation);
+        classRepository.save(c);
         //check location Exist
         Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
+        //save class
+
         //create schedule
         List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
         List<Schedule> scheduleList = new ArrayList<>();
@@ -138,7 +142,7 @@ public class ClassServiceImpl implements IClassService {
                     .filter(a -> subject.getSubjectId().equals(a.getSubjectId())) // Replace `subjectId` with the desired ID to match
                     .findFirst()
                     .orElse(null); // Return null if no match is found
-            if(cst!=null){
+            if (cst != null) {
                 Schedule schedule = Schedule.builder().startDate(model.getStartDate()).endDate(model.getEndDate()).status(true).slot(cst.getSlot())
                         .classs(c).subject(subject).location(location).trainer(cst.getTrainer()).description(model.getDescription()).build();
                 scheduleList.add(schedule);
@@ -188,9 +192,11 @@ public class ClassServiceImpl implements IClassService {
     }
 
     @Override
-    public ApiResponse<?> getTraineeForClass(Long classId) {
+    public ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeForClass(Long classId) {
         List<User> list = userRepository.findUsersByClassId(classId);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);
+        List<TraineeResponse.TraineeInfoDTO> trainerList = mapper.map(list, new TypeToken<List<TraineeResponse.TraineeInfoDTO>>() {
+        }.getType());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), trainerList);
     }
 
 }

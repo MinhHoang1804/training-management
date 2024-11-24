@@ -3,10 +3,7 @@ package com.g96.ftms.service.classes;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.request.TrainerRequest;
-import com.g96.ftms.dto.response.ApiResponse;
-import com.g96.ftms.dto.response.ClassReponse;
-import com.g96.ftms.dto.response.SubjectResponse;
-import com.g96.ftms.dto.response.TrainerResponse;
+import com.g96.ftms.dto.response.*;
 import com.g96.ftms.entity.Subject;
 
 import java.util.List;
@@ -25,5 +22,5 @@ public interface IClassService {
 
     ApiResponse<?> acceptClass(ClassRequest.UpdateStatusClassFrom model);
 
-    ApiResponse<?> getTraineeForClass(Long classId);
+    ApiResponse< List<TraineeResponse.TraineeInfoDTO>> getTraineeForClass(Long classId);
 }
