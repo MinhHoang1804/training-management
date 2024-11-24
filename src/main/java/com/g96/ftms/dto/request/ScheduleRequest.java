@@ -1,5 +1,6 @@
 package com.g96.ftms.dto.request;
 
+import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.entity.Session;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class ScheduleRequest {
     public static class ScheduleGenerateDto {
         LocalDate startDate;
         Integer slot;
-        List<Session> sessions;
+        List<SessionResponse.SessionInfoDTO> sessions;
     }
+
 }

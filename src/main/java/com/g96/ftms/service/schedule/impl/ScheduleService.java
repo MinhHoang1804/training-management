@@ -3,6 +3,7 @@ package com.g96.ftms.service.schedule.impl;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.ScheduleResponse;
 import com.g96.ftms.dto.response.SchemeResponse;
+import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.entity.Session;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.service.schedule.IScheduleService;
@@ -22,11 +23,11 @@ public class ScheduleService implements IScheduleService {
     private final ModelMapper mapper;
 
     @Override
-    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate,Integer slot, List<Session> sessions) {
+    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate,Integer slot, List<SessionResponse.SessionInfoDTO> sessions) {
         List<ScheduleResponse.ScheDuleDetailsInfo> list = new ArrayList<>();
         LocalDate currentDate = startDate;
 
-        for (Session session : sessions) {
+        for (SessionResponse.SessionInfoDTO session : sessions) {
             // Skip weekends
             while (currentDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
                     currentDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
