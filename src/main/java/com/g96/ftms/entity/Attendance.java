@@ -1,5 +1,6 @@
 package com.g96.ftms.entity;
 
+import com.g96.ftms.util.constants.AttendanceStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,8 +32,8 @@ public class Attendance {
     private ScheduleDetail scheduleDetail;
 
 
-    @Column(name="status")
-    private Boolean status;
+    @Column(name="status",columnDefinition = "ENUM('A','An','E','En','L','Ln','P')")
+    private AttendanceStatus status;
 
     @Column(name="record_time")
     private LocalDateTime recordTime;

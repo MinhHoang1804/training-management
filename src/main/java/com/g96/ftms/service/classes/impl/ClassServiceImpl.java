@@ -13,6 +13,7 @@ import com.g96.ftms.service.classes.IClassService;
 import com.g96.ftms.service.email.EmailService;
 import com.g96.ftms.service.schedule.IScheduleService;
 import com.g96.ftms.util.SqlBuilderUtils;
+import com.g96.ftms.util.constants.AttendanceStatus;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +41,7 @@ public class ClassServiceImpl implements IClassService {
     private final GenerationRepository generationRepository;
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final EmailService emailService;
+    private final AttendanceRepository attendanceRepository;
 
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
@@ -177,6 +180,12 @@ public class ClassServiceImpl implements IClassService {
             }
         }
         scheduleDetailRepository.saveAll(scheduleDetailList);
+
+        List<Long> list = getTraineeForClass(c.getClassId())
+                .getData().stream().map(TraineeResponse.TraineeInfoDTO::getUserId).toList();
+        //generate attendance
+
+        generateAttendanceList(scheduleDetailList, list);
         try {
             emailService.sendMailToAcceptRequest("Admin", user.getEmail(), user.getFullName(), c.getClassCode(), c.getClassId());
         } catch (Exception E) {
@@ -201,4 +210,22 @@ public class ClassServiceImpl implements IClassService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), trainerList);
     }
 
+    public void generateAttendanceList(List<ScheduleDetail> scheduleDetails, List<Long> userIds) {
+        List<Attendance> attendanceList = new ArrayList<>();
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElseThrow(() ->
+                    new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+            for (ScheduleDetail s : scheduleDetails) {
+                AttendanceId attendanceId = AttendanceId.builder().scheduleDetailId(s.getScheduleDetailId()).userId(userId).build();
+                Attendance attendance = Attendance.builder().id(attendanceId)
+                        .user(user)
+                        .scheduleDetail(s)
+                        .status(AttendanceStatus.P).build();
+                attendanceList.add(attendance);
+            }
+        }
+        //save entity
+
+        attendanceRepository.saveAll(attendanceList);
+    }
 }
