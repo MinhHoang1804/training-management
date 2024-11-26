@@ -32,4 +32,8 @@ public class Location {
     @OneToMany(mappedBy = "location", fetch = FetchType.LAZY)
     @JsonBackReference
     private List<Schedule> schedules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY)
+    @JsonBackReference
+    private List<Class> classList = new ArrayList<>();
 }

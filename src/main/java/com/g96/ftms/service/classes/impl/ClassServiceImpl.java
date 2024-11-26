@@ -11,7 +11,6 @@ import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.classes.IClassService;
 import com.g96.ftms.service.email.EmailService;
-import com.g96.ftms.service.generation.IGenerationService;
 import com.g96.ftms.service.schedule.IScheduleService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +61,8 @@ public class ClassServiceImpl implements IClassService {
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
 
         ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
+        response.setCurriculumName(c.getCurriculum().getCurriculumName());
+        response.setLocationName(c.getLocation().getLocationName());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
@@ -127,10 +128,11 @@ public class ClassServiceImpl implements IClassService {
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         User user = userRepository.findByAccount(c.getAdmin());
         Generation generation = generationRepository.findById(model.getGenerationId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.GENERATION_NOT_FOUND));
+        Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
         c.setGeneration(generation);
+        c.setLocation(location);
         classRepository.save(c);
         //check location Exist
-        Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
         //save class
 
         //create schedule

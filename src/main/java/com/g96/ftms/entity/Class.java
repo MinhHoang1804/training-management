@@ -47,6 +47,11 @@ public class Class {
     @Column(name="plan_Trainee_no")
     private Integer planTraineeNo;
 
+
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+
     @OneToMany(mappedBy = "classs",fetch = FetchType.LAZY)
     @JsonBackReference
     List<Schedule> schedules;
@@ -66,6 +71,7 @@ public class Class {
     @ManyToOne
     @JoinColumn(name = "curriculum_id")
     private Curriculum curriculum;
+
     @ManyToOne
     @JoinColumn(name = "generation_id")
     private Generation generation;

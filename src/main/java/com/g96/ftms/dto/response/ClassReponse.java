@@ -21,6 +21,8 @@ public class ClassReponse {
         private LocalDateTime endDate ;
         private LocalDateTime startDate;
         private LocalDateTime createdDate;
+        private String locationName;
+        private String curriculumName;
     }
 
     @Data
