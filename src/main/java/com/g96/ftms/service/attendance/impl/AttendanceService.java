@@ -60,6 +60,7 @@ public class AttendanceService implements IAttendanceService {
             AttendanceResponse.AttendanceStatusResponse attendanceStatus = AttendanceResponse.AttendanceStatusResponse.builder()
                     .status(attendance.getStatus())
                     .attendanceNote(attendance.getAttendanceNote())
+                    .scheduleDetailId(scheduleDetail.getScheduleDetailId())
                     .build();
             litAttendanceStatuses.add(attendanceStatus);
         }
@@ -70,4 +71,21 @@ public class AttendanceService implements IAttendanceService {
                 .build();
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
+
+    @Override
+    public ApiResponse<?> editStatus(AttendanceServiceRequest.AttendanceUserEditRequest model) {
+        List<Attendance> attendanceList=new ArrayList<>();
+        for(AttendanceServiceRequest.AttendanceUserStatus a : model.getData()){
+            Attendance attendance = attendanceRepository.findByUser_UserIdAndScheduleDetail_ScheduleDetailId(a.getUserId(), a.getUserId());
+            if(attendance!=null){
+                attendance.setStatus(a.getStatus());
+                attendance.setAttendanceNote(a.getAttendanceNote());
+                attendanceList.add(attendance);
+            }
+        }
+        attendanceRepository.saveAll(attendanceList);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+
+    }
+
 }

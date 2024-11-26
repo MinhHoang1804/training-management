@@ -24,4 +24,9 @@ public class AttendanceController {
     public ApiResponse<?> getClassList(@RequestBody AttendanceServiceRequest.SearchByUserRequest model) {
         return attendanceService.getUserAttendance(model.getUserId(),model.getClassId(),model.getSubjectId());
     }
+
+    @GetMapping("/attendance-update")
+    public ApiResponse<?> attendanceEdit(@RequestBody AttendanceServiceRequest.AttendanceUserEditRequest model) {
+        return attendanceService.editStatus(model);
+    }
 }

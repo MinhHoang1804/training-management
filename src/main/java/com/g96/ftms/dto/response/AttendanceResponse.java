@@ -34,5 +34,7 @@ public class AttendanceResponse {
     public static class AttendanceStatusResponse {
         private AttendanceStatus status;
         private String attendanceNote;
+        private Long scheduleDetailId;
     }
+
 }
