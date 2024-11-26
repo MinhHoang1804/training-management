@@ -27,4 +27,9 @@ public class TraineeController {
     public ApiResponse<?> importTrainees( @RequestParam("classId") Long classId ,@Parameter(description = "File Excel to upload") @RequestParam("file") MultipartFile file) {
             return traineeService.importExcelFile(file,classId);
     }
+
+    @PostMapping(value = "/remove-trainee-by-class")
+    public ApiResponse<?> removeTraineeByClass(TraineeRequest.TraineeRemoveRequest model) {
+        return traineeService.removeTrainee(model);
+    }
 }

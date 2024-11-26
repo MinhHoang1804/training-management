@@ -25,6 +25,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -72,6 +73,16 @@ public class TraineeSerivce implements ITraineeService {
         }catch (Exception e){
             throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_WRONG_FORMAT);
         }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<?> removeTrainee(TraineeRequest.TraineeRemoveRequest model) {
+        List<UserClassRelationId> list = model.getListUserIds().stream().map(s -> {
+            return UserClassRelationId.builder().classId(model.getClassId()).userId(s).build();
+        }).toList();
+        userClassRelationRepository.deleteAllById(list);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
     }
 
     private List<TraineeRequest.TraineeAddRequest> readExcelFile(MultipartFile file) throws IOException {

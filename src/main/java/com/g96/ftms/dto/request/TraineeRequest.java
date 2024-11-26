@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class TraineeRequest {
     @Data
     @NoArgsConstructor
@@ -20,5 +22,14 @@ public class TraineeRequest {
     @Builder
     public static class TraineeAddRequest {
         private String account;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TraineeRemoveRequest {
+        private Long classId;
+        List<Long>listUserIds;
     }
 }

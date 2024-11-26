@@ -10,4 +10,5 @@ public interface ITraineeService {
     ApiResponse<PagedResponse<TraineeResponse.TraineeInfoDTO>> search(TraineeRequest.TraineePagingRequest model);
 
     ApiResponse<?> importExcelFile(MultipartFile file, Long classId);
+    ApiResponse<?> removeTrainee(TraineeRequest.TraineeRemoveRequest model);
 }
