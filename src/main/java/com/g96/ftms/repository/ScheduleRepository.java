@@ -15,4 +15,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<String> findTraineesInRangeAndSlot(@Param("slot") Integer slot,
                                             @Param("startDate") LocalDateTime startDate,
                                             @Param("endDate") LocalDateTime endDate);
+
+    Schedule findBySubject_SubjectIdAndClasss_ClassId(Long subjectId, Long classId);
 }

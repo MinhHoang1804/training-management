@@ -1,0 +1,12 @@
+package com.g96.ftms.service.attendance;
+
+import com.g96.ftms.dto.request.AttendanceServiceRequest;
+import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.AttendanceResponse;
+
+public interface IAttendanceService {
+
+    ApiResponse<AttendanceResponse.SearchResponse> searchByClass(AttendanceServiceRequest.SearchRequest model);
+
+    ApiResponse<AttendanceResponse.UserAttendanceResponse> getUserAttendance(Long userId, Long classId, Long subjectId);
+}

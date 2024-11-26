@@ -6,7 +6,6 @@ import com.g96.ftms.dto.request.TrainerRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.classes.IClassService;
 import com.g96.ftms.service.schedule.IScheduleService;
-import com.g96.ftms.service.session.ISessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

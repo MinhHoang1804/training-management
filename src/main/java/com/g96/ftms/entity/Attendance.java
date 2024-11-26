@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -21,12 +22,12 @@ public class Attendance {
     @EmbeddedId
     AttendanceId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("scheduleDetailId")
     @JoinColumn(name = "schedule_detail_id")
     private ScheduleDetail scheduleDetail;
@@ -35,6 +36,7 @@ public class Attendance {
     @Column(name="status",columnDefinition = "ENUM('A','An','E','En','L','Ln','P')")
     private AttendanceStatus status;
 
+    @LastModifiedDate
     @Column(name="record_time")
     private LocalDateTime recordTime;
 
