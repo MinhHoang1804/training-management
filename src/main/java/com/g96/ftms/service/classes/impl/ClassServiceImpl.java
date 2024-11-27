@@ -64,8 +64,12 @@ public class ClassServiceImpl implements IClassService {
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
 
         ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
-        response.setCurriculumName(c.getCurriculum().getCurriculumName());
-        response.setLocationName(c.getLocation().getLocationName());
+        if (c.getCurriculum() != null) {
+            response.setCurriculumName(c.getCurriculum().getCurriculumName());
+        }
+        if (c.getLocation() != null) {
+            response.setLocationName(c.getLocation().getLocationName());
+        }
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 

@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 public interface GenerationRepository  extends JpaRepository<Generation, Long> {
     boolean existsByGenerationNameAndGetGenerationIdNot(String generationName, Long getGenerationId);
-    boolean existsByGenerationName(String generationName);
 
     Optional<Generation> findByGenerationName(String generationName);
 }

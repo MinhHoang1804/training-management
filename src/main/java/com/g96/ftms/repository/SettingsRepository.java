@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SettingsRepository extends JpaRepository<Settings, Long> {
+    boolean existsByDescriptionAndLocation_LocationNameAndSettingIdNot(String description, String locationName, Long settingId);
     boolean existsByDescriptionAndLocation_LocationName(String description, String locationName);
     boolean existsByDescriptionAndGeneration_GenerationName(String description, String generationName);
     @Query("SELECT s FROM Settings s " +

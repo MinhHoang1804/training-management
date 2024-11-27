@@ -119,13 +119,19 @@ public class SettingServiceImpl implements ISettingService {
                 }
                 Optional<Generation> byGenerationName = generationRepository.findByGenerationName(model.getSettingName());
                 if(byGenerationName.isPresent()){
-                    Generation newGê = byGenerationName.get();
                     setting.setDescription(model.getDescription());
                     setting.setGeneration(byGenerationName.get());
                     settingsRepository.save(setting);
                     return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
                 }
             }
+
+            if(generation.getGenerationName().equalsIgnoreCase(model.getSettingName())){//change desc
+                setting.setDescription(model.getDescription());
+                settingsRepository.save(setting);
+                return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
+            }
+
             //create new generation
             Generation g=Generation.builder().generationName(model.getSettingName()).build();
             generationRepository.save(g);
@@ -136,9 +142,9 @@ public class SettingServiceImpl implements ISettingService {
         if (model.getSettingGroup() == SettingGroupEnum.LOCATION) {
             //check room exist
             Location location = setting.getLocation();
-            if(locationRepository.existsByLocationNameAndLocationId(model.getSettingName(),location.getLocationId())){
+            if(locationRepository.existsByLocationNameAndLocationIdNot(model.getSettingName(),location.getLocationId())){ //exist
                 //check duplicate
-                if(settingsRepository.existsByDescriptionAndLocation_LocationName(model.getDescription(),model.getSettingName())){
+                if(settingsRepository.existsByDescriptionAndLocation_LocationNameAndSettingIdNot(model.getDescription(), model.getSettingName(),model.getId())){
                     throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SETTING);
                 }
                 Optional<Location> byRoomName = locationRepository.findByLocationName(model.getSettingName());
@@ -148,6 +154,11 @@ public class SettingServiceImpl implements ISettingService {
                     settingsRepository.save(setting);
                     return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
                 }
+            }
+            if(location.getLocationName().equalsIgnoreCase(model.getSettingName())){//change desc
+                setting.setDescription(model.getDescription());
+                settingsRepository.save(setting);
+                return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), setting);
             }
             //create new generation
             Location g=Location.builder().locationName(model.getSettingName()).build();

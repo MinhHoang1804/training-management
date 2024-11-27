@@ -59,7 +59,7 @@ public class TraineeSerivce implements ITraineeService {
             List<UserClassRelation>userClassRelationList=new ArrayList<>();
             for (TraineeRequest.TraineeAddRequest item:list){
                 User user = userRepository.findByAccount(item.getAccount());
-                if(user!=null){
+                if(user!=null&&user.getUserClassRelationList()==null){ //user not in class
                     UserClassRelation userClassRelation= UserClassRelation.builder()
                             .user(user)
                             .classs(c)
