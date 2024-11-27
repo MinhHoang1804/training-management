@@ -29,7 +29,7 @@ public class TraineeController {
     }
 
     @PostMapping(value = "/remove-trainee-by-class")
-    public ApiResponse<?> removeTraineeByClass(TraineeRequest.TraineeRemoveRequest model) {
+    public ApiResponse<?> removeTraineeByClass(@RequestBody TraineeRequest.TraineeRemoveRequest model) {
         return traineeService.removeTrainee(model);
     }
 }
