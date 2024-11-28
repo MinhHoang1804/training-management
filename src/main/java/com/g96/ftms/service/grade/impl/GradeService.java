@@ -43,7 +43,9 @@ public class GradeService implements IGradeService {
         for (User user : pages.getContent()) {
             // Lấy danh sách điểm của `User` theo classId
             GradeResponse.GradeInfoDTO gradesByUserId = getGradesByUserId(user.getUserId(), model.getClassId());
-            list.add(gradesByUserId);
+            if(gradesByUserId!=null){
+                list.add(gradesByUserId);
+            }
         }
 
         // Tạo `Page<GradeInfoDTO>` từ danh sách `list`
