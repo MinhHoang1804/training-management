@@ -72,7 +72,7 @@ public class GradeService implements IGradeService {
                 .grade(grade.getGrade())
                 .lastUpdate(grade.getGradeDate())
                 .build();
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), null);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
     @Override
