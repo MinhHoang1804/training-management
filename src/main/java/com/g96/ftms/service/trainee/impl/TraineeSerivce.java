@@ -55,11 +55,11 @@ public class TraineeSerivce implements ITraineeService {
             Class c = classRepository.findById(classId).orElseThrow(() ->
                     new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
 
-            if(list.isEmpty()) throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_EMPTY);
+             if(list.isEmpty()) throw new AppException(HttpStatus.BAD_REQUEST,ErrorCode.FILE_EMPTY);
             List<UserClassRelation>userClassRelationList=new ArrayList<>();
             for (TraineeRequest.TraineeAddRequest item:list){
                 User user = userRepository.findByAccount(item.getAccount());
-                if(user!=null&&user.getUserClassRelationList()==null){ //user not in class
+                if(user!=null&&(user.getUserClassRelationList().isEmpty())){ //user not in class
                     UserClassRelation userClassRelation= UserClassRelation.builder()
                             .user(user)
                             .classs(c)
