@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/grade-management")
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class GradeController {
     }
 
     @PostMapping("/add-grade-trainee")
-    public ApiResponse<?> addGrade(@RequestBody GradeRequest.GradedSubjectAddRequest model) {
+    public ApiResponse<?> addGrade(@RequestBody List<GradeRequest.GradedSubjectAddRequest> model) {
         return gradeService.addGradeForTrainee(model);
     }
 

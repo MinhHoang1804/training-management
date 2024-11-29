@@ -97,7 +97,17 @@ public class GradeService implements IGradeService {
     }
 
     @Override
-    public ApiResponse<?> addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model) {
+    @Transactional
+    public ApiResponse<?> addGradeForTrainee(List<GradeRequest.GradedSubjectAddRequest> model) {
+        List<GradeRequest.GradedSubjectAddRequest>list=new ArrayList<>();
+        for (GradeRequest.GradedSubjectAddRequest item : model) {
+            addGradeForTrainee(item);
+        }
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+
+    }
+
+    public void addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model) {
         User user = userRepository.findByAccount(model.getUser());
         if (user == null) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
@@ -125,7 +135,6 @@ public class GradeService implements IGradeService {
                 .build();
         map.setId(gradeId);
         gradeRepository.save(map);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
     }
 
 

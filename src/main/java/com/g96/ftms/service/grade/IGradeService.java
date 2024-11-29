@@ -5,6 +5,8 @@ import com.g96.ftms.dto.request.GradeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.GradeResponse;
 
+import java.util.List;
+
 public interface IGradeService {
     ApiResponse<PagedResponse<GradeResponse.GradeInfoDTO>> search(GradeRequest.GradePagingRequest model);
 
@@ -12,5 +14,5 @@ public interface IGradeService {
 
     ApiResponse<?> saveGradeSetting(GradeRequest.GradeSettingUpdateRequest model);
 
-    ApiResponse<?> addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model);
+    ApiResponse<?> addGradeForTrainee(List<GradeRequest.GradedSubjectAddRequest> model);
 }
