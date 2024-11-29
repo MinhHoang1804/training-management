@@ -5,17 +5,14 @@ import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.attendance.IAttendanceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/attendance-management")
 @RequiredArgsConstructor
 public class AttendanceController {
     private final IAttendanceService attendanceService;
-    @GetMapping("/search-by-class")
+    @PostMapping("/search-by-class")
     public ApiResponse<?> getClassList(@RequestBody AttendanceServiceRequest.SearchRequest model) {
         return attendanceService.searchByClass(model);
     }
@@ -25,7 +22,7 @@ public class AttendanceController {
         return attendanceService.getUserAttendance(model.getUserId(),model.getClassId(),model.getSubjectId());
     }
 
-    @GetMapping("/attendance-update")
+    @PostMapping("/attendance-update")
     public ApiResponse<?> attendanceEdit(@RequestBody AttendanceServiceRequest.AttendanceUserEditRequest model) {
         return attendanceService.editStatus(model);
     }

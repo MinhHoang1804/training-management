@@ -14,7 +14,6 @@ public class AttendanceServiceRequest {
     public static class SearchRequest {
         private Long subjectId;
         private Long classId;
-        private LocalDateTime date;
     }
 
     @Data

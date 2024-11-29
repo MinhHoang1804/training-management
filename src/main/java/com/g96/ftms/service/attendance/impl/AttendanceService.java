@@ -57,12 +57,15 @@ public class AttendanceService implements IAttendanceService {
 
         for (ScheduleDetail scheduleDetail : scheduleDetailList) {
             Attendance attendance = attendanceRepository.findByUser_UserIdAndScheduleDetail_ScheduleDetailId(userId, scheduleDetail.getScheduleDetailId());
-            AttendanceResponse.AttendanceStatusResponse attendanceStatus = AttendanceResponse.AttendanceStatusResponse.builder()
-                    .status(attendance.getStatus())
-                    .attendanceNote(attendance.getAttendanceNote())
-                    .scheduleDetailId(scheduleDetail.getScheduleDetailId())
-                    .build();
-            litAttendanceStatuses.add(attendanceStatus);
+           if(attendance!=null){
+               AttendanceResponse.AttendanceStatusResponse attendanceStatus = AttendanceResponse.AttendanceStatusResponse.builder()
+                       .status(attendance.getStatus())
+                       .attendanceNote(attendance.getAttendanceNote())
+                       .scheduleDetailId(scheduleDetail.getScheduleDetailId())
+                       .build();
+               litAttendanceStatuses.add(attendanceStatus);
+
+           }
         }
         AttendanceResponse.UserAttendanceResponse response = AttendanceResponse.UserAttendanceResponse.builder()
                 .userId(userId)
