@@ -23,14 +23,16 @@ public class GradeResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
+    @Builder
     public static class GradeComponent {
         private String subjectName;
         private Double grade;
+        List<SchemeResponse.SubjectSchemeGrade>gradeComponents;
         public GradeComponent(String subjectName, Double grade) {
             this.subjectName = subjectName;
             this.grade = grade;
         }
-        private Double weight;
+//        private Double weight;
     }
 
     @NoArgsConstructor
