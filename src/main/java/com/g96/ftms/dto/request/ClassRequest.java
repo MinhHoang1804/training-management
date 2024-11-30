@@ -35,6 +35,7 @@ public class ClassRequest {
         private Long locationId;
         private Long curriculumId;
         private Long generationId;
+        private String classCode;
         private String description;
         private LocalDateTime endDate ;
         private LocalDateTime startDate;

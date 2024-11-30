@@ -34,6 +34,9 @@ public class Class {
     @Column
     private String admin;
 
+    @Column
+    private String supplier;
+
     @Column(updatable = false)
     private LocalDateTime createdDate = LocalDateTime.now();
 

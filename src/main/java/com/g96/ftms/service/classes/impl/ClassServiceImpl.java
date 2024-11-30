@@ -138,6 +138,10 @@ public class ClassServiceImpl implements IClassService {
         Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
         c.setGeneration(generation);
         c.setLocation(location);
+        c.setStartDate(model.getStartDate());
+        c.setEndDate(model.getEndDate());
+        c.setClassCode(model.getClassCode());
+        c.setDescriptions(model.getDescription());
         classRepository.save(c);
         //check location Exist
         //save class

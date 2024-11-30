@@ -62,6 +62,8 @@ public class AttendanceService implements IAttendanceService {
                        .status(attendance.getStatus())
                        .attendanceNote(attendance.getAttendanceNote())
                        .scheduleDetailId(scheduleDetail.getScheduleDetailId())
+                       .startDate(attendance.getScheduleDetail().getStartTime())
+                       .endDate(attendance.getScheduleDetail().getEndTime())
                        .build();
                litAttendanceStatuses.add(attendanceStatus);
 

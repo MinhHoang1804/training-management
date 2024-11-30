@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class AttendanceResponse {
@@ -35,6 +36,8 @@ public class AttendanceResponse {
         private AttendanceStatus status;
         private String attendanceNote;
         private Long scheduleDetailId;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
     }
 
 }

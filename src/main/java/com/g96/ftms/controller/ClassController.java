@@ -16,7 +16,7 @@ public class ClassController {
     private final IClassService classService;
     private final IScheduleService scheduleService;
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ApiResponse<?> getClassList(@RequestBody ClassRequest.ClassPagingRequest model) {
         return classService.search(model);
     }
@@ -48,7 +48,7 @@ public class ClassController {
     }
     //s
 
-    @PostMapping("/update-class-by-admin/{id}")
+    @PostMapping("/update-class-by-admin")
     public ApiResponse<?> updateClassByAdmin(@RequestBody ClassRequest.UpdateClassByAdminForm model) {
         return classService.updateClassByAdmin(model);
     }
