@@ -18,8 +18,9 @@ public class AttendanceServiceRequest {
 
     @Data
     @NoArgsConstructor
-    public static class SearchByUserRequest extends SearchRequest {
-        private Long userId;
+    public static class SearchByUserRequest  {
+        private Long classId;
+        private String userName;
     }
 
     @Data

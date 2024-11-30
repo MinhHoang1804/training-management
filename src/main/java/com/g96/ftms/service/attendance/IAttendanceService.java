@@ -9,6 +9,7 @@ public interface IAttendanceService {
     ApiResponse<AttendanceResponse.SearchResponse> searchByClass(AttendanceServiceRequest.SearchRequest model);
 
     ApiResponse<AttendanceResponse.UserAttendanceResponse> getUserAttendance(Long userId, Long classId, Long subjectId);
+    ApiResponse<AttendanceResponse.UserAttendanceAllSubjectResponse> getUserTimeTable(String userName, Long classId);
 
     ApiResponse<?> editStatus(AttendanceServiceRequest.AttendanceUserEditRequest model);
 }

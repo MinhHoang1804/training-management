@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class AttendanceResponse {
     @Data
@@ -27,6 +28,28 @@ public class AttendanceResponse {
         private String fullName;
         List<AttendanceStatusResponse> litAttendanceStatuses;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UserAttendanceAllSubjectResponse {
+        private Long userId;
+        private String userName;
+        private String fullName;
+        private String className;
+        List<UserAttendanceSubject> listSubjectTimeTable;
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UserAttendanceSubject {
+        private String subjectName;
+        List<AttendanceStatusResponse>listWeeklyAttendances;
+    }
+
+
 
     @Data
     @NoArgsConstructor

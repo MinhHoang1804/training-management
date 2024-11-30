@@ -17,9 +17,9 @@ public class AttendanceController {
         return attendanceService.searchByClass(model);
     }
 
-    @GetMapping("/attendance-by-user")
+    @PostMapping("/attendance-by-user")
     public ApiResponse<?> getClassList(@RequestBody AttendanceServiceRequest.SearchByUserRequest model) {
-        return attendanceService.getUserAttendance(model.getUserId(),model.getClassId(),model.getSubjectId());
+        return attendanceService.getUserTimeTable(model.getUserName(),model.getClassId());
     }
 
     @PostMapping("/attendance-update")
