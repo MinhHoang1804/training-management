@@ -24,4 +24,7 @@ public interface IClassService {
     ApiResponse<?> acceptClass(ClassRequest.UpdateStatusClassFrom model);
 
     ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeForClass(Long classId);
+
+    ApiResponse<?> getClassUser(Long userId);
+
 }

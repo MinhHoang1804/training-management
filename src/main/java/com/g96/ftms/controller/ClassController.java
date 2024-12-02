@@ -62,5 +62,10 @@ public class ClassController {
         return classService.acceptClass(model);
     }
 
+    @PostMapping("/get-class-user/{userId}")
+    public ApiResponse<?> getClassUser(@PathVariable("userId") Long userId) {
+        return classService.getClassUser(userId);
+    }
+
 
 }
