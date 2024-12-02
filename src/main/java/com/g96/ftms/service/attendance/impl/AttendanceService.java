@@ -47,6 +47,9 @@ public class AttendanceService implements IAttendanceService {
     @Override
     public ApiResponse<AttendanceResponse.UserAttendanceResponse> getUserAttendance(Long userId, Long classId, Long subjectId) {
         Schedule schedule = scheduleRepository.findBySubject_SubjectIdAndClasss_ClassId(subjectId, classId);
+        if(schedule==null) {
+            throw new AppException(HttpStatus.NOT_FOUND,ErrorCode.SCHEDULE_NOT_FOUND);
+        }
         List<ScheduleDetail> scheduleDetailList = schedule.getScheduleDetailList();
         List<AttendanceResponse.AttendanceStatusResponse> litAttendanceStatuses = new ArrayList<>();
 
@@ -109,7 +112,7 @@ public class AttendanceService implements IAttendanceService {
     public ApiResponse<?> editStatus(AttendanceServiceRequest.AttendanceUserEditRequest model) {
         List<Attendance> attendanceList = new ArrayList<>();
         for (AttendanceServiceRequest.AttendanceUserStatus a : model.getData()) {
-            Attendance attendance = attendanceRepository.findByUser_UserIdAndScheduleDetail_ScheduleDetailId(a.getUserId(), a.getUserId());
+            Attendance attendance = attendanceRepository.findByUser_UserIdAndScheduleDetail_ScheduleDetailId(a.getUserId(), a.getScheduleDetailId());
             if (attendance != null) {
                 attendance.setStatus(a.getStatus());
                 attendance.setAttendanceNote(a.getAttendanceNote());
