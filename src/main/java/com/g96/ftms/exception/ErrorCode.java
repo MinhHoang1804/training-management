@@ -42,7 +42,8 @@ public enum ErrorCode {
     FILE_WRONG_FORMAT("ERR035","File sai format"),
     EXPORT_FAILED("ERR036","Đã có lỗi xảy ra"),
     SCHEME_NOT_FOUND("ERR037","Không tìm thấy điểm thành phần"),
-    SCHEME_NOT_FOUND_IN_SUBJECT("ERR038","Không tìm thấy điểm thành phần này ở môn học");
+    SCHEME_NOT_FOUND_IN_SUBJECT("ERR038","Không tìm thấy điểm thành phần này ở môn học"),
+    USER_FEEDBACK_EXIST("ERR039","Ngươi dùng này đã feedback");
     private final String code;
     private final String message;
 

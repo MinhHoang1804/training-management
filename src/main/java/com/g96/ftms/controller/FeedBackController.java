@@ -30,6 +30,11 @@ public class FeedBackController {
         return feedBackService.createFeedBack(model);
     }
 
+    @PostMapping("/check-feedback-subject")
+    public ApiResponse<?> checkFeedBackSubject(@RequestBody FeedBackRequest.FeedBackCheckRequest model) {
+        return feedBackService.checkFeedBackSubject(model);
+    }
+
     @PostMapping("/update")
     public ApiResponse<?> updateFeedback(@RequestBody FeedBackRequest.FeedBackEditRequest model) {
         return feedBackService.updateFeedBack(model);

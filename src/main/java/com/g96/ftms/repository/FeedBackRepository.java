@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface FeedBackRepository  extends JpaRepository<FeedBack,Long> {
     @Query("SELECT f FROM FeedBack f " +
@@ -20,4 +22,8 @@ public interface FeedBackRepository  extends JpaRepository<FeedBack,Long> {
     Page<FeedBack> searchFilter(@Param("keywordFilter") String keywordFilter,
                                @Param("userId") Long userId ,@Param("subjectId") Long subjectId,@Param("classId") Long classId,
                                Pageable pageable);
+
+    boolean existsByUser_UserIdAndClasss_ClassIdAndSubject_SubjectId(Long userId, Long classId, Long subjectId);
+
+    Optional<FeedBack> findFirstByUser_UserIdAndClasss_ClassIdAndSubject_SubjectId(Long userId, Long classId, Long subjectId);
 }

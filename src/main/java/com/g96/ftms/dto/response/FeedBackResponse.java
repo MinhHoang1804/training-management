@@ -51,4 +51,14 @@ public class FeedBackResponse {
         Questions questions;
         String answer;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class FeedBackCheckResponse {
+        private Boolean isOpenFeedBack;
+        private Boolean isExistFeedBack;
+        private Long feedBackId;
+    }
 }

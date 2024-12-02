@@ -16,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +93,9 @@ public class FeedbackService implements IFeedBackService {
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
         Class aClass = classRepository.findById(model.getClassId()).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        //check exist
+        boolean isExist = feedBackRepository.existsByUser_UserIdAndClasss_ClassIdAndSubject_SubjectId(user.getUserId(), model.getClassId(), model.getSubjectId());
+        if (isExist) throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_FEEDBACK_EXIST);
         FeedBack feedBack = FeedBack.builder()
                 .subject(subject).user(user).classs(aClass)
                 .description(model.getDescription())
@@ -136,6 +141,40 @@ public class FeedbackService implements IFeedBackService {
         feedBack.setAvgRating(averageRatingByFeedbackId);
         feedBackRepository.save(feedBack);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), fSave);
+    }
+
+    @Override
+    public ApiResponse<FeedBackResponse.FeedBackCheckResponse> checkFeedBackSubject(FeedBackRequest.FeedBackCheckRequest model) {
+        //create feed back
+        Subject subject = subjectRepository.findById(model.getSubjectId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        User user = userRepository.findById(model.getUserId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        Class aClass = classRepository.findById(model.getClassId()).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        FeedBackResponse.FeedBackCheckResponse response = FeedBackResponse.FeedBackCheckResponse.builder()
+                .isOpenFeedBack(false)
+                .isExistFeedBack(false)
+                .build();
+
+        if (!checkClassIntime(aClass)) { //expired time
+            response.setIsOpenFeedBack(true);
+        }
+        boolean isExist = feedBackRepository.existsByUser_UserIdAndClasss_ClassIdAndSubject_SubjectId(user.getUserId(), aClass.getClassId(), subject.getSubjectId());
+        if (isExist) {
+            response.setIsExistFeedBack(true);
+            Optional<FeedBack> fb = feedBackRepository.findFirstByUser_UserIdAndClasss_ClassIdAndSubject_SubjectId(user.getUserId(), aClass.getClassId(), subject.getSubjectId());
+            fb.ifPresent(feedBack -> response.setFeedBackId(feedBack.getFeedbackId()));
+        }
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    public Boolean checkClassIntime(Class classs) {
+        if (classs.getEndDate() == null) return false;
+        if (classs.getEndDate().isAfter(LocalDateTime.now())) {
+            return true;
+        }
+        return false;
     }
 
     private FeedBackResponse.QuestionAnswerFormInfoDTO mapToQuestionAnswerFormInfoDTO(FeedbackAnswer feedbackAnswer) {

@@ -63,4 +63,14 @@ public class FeedBackRequest {
         private String description;
         List<QuestionAnswerFormRequest>listAnswers;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class FeedBackCheckRequest {
+        private Long classId;
+        private Long subjectId;
+        private Long userId;
+    }
 }

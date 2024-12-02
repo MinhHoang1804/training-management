@@ -14,4 +14,6 @@ public interface IFeedBackService {
     ApiResponse<FeedBack> createFeedBack(FeedBackRequest.FeedBackAddRequest model);
 
     ApiResponse<FeedBack> updateFeedBack(FeedBackRequest.FeedBackEditRequest model);
+
+    ApiResponse<FeedBackResponse.FeedBackCheckResponse> checkFeedBackSubject(FeedBackRequest.FeedBackCheckRequest model);
 }

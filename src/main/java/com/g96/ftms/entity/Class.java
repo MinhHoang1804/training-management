@@ -27,7 +27,7 @@ public class Class {
     private String classCode;
 
     @Column
-    private boolean status = true;
+    private Boolean status;
 
     private String descriptions;
 
