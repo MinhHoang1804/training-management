@@ -61,6 +61,8 @@ public class AttendanceResponse {
         private Long scheduleDetailId;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private String trainer;
+        private String location;
     }
 
 }

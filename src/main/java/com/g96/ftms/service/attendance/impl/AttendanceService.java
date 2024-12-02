@@ -62,9 +62,10 @@ public class AttendanceService implements IAttendanceService {
                         .scheduleDetailId(scheduleDetail.getScheduleDetailId())
                         .startDate(attendance.getScheduleDetail().getStartTime())
                         .endDate(attendance.getScheduleDetail().getEndTime())
+                        .trainer(scheduleDetail.getSchedule().getTrainer())
+                        .location(scheduleDetail.getSchedule().getLocation().getLocationName())
                         .build();
                 litAttendanceStatuses.add(attendanceStatus);
-
             }
         }
         AttendanceResponse.UserAttendanceResponse response = AttendanceResponse.UserAttendanceResponse.builder()
