@@ -1,7 +1,6 @@
 package com.g96.ftms.controller;
 
 import com.g96.ftms.dto.request.AttendanceServiceRequest;
-import com.g96.ftms.dto.request.ClassRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.service.attendance.IAttendanceService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,11 @@ public class AttendanceController {
     }
 
     @PostMapping("/attendance-report-user")
-    public ApiResponse<?> getAttendanceReportUser(@RequestBody AttendanceServiceRequest.AttendanceUserReportUserRequest model) {
+    public ApiResponse<?> getAttendanceReportUser(@RequestBody AttendanceServiceRequest.AttendanceUserReportRequest model) {
         return attendanceService.getAttendanceReport(model.getUserId(), model.getClassId(),model.getSubjectId());
+    }
+    @PostMapping("/attendance-report-list")
+    public ApiResponse<?> getAttendanceReportUser(@RequestBody AttendanceServiceRequest.SearchRequest model) {
+        return attendanceService.getAttendanceReportByClass(model);
     }
 }

@@ -1,12 +1,10 @@
 package com.g96.ftms.dto.request;
 
-import com.g96.ftms.dto.common.PagingBaseParams;
 import com.g96.ftms.util.constants.AttendanceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class AttendanceServiceRequest {
@@ -42,9 +40,10 @@ public class AttendanceServiceRequest {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AttendanceUserReportUserRequest {
+    public static class AttendanceUserReportRequest {
         private Long userId;
         private Long classId;
         private Long subjectId;
     }
+
 }

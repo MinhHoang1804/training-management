@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public class AttendanceResponse {
     @Data
@@ -69,11 +68,21 @@ public class AttendanceResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class AttendanceStatusReportResponse {
-        int absent;
-        int late;
-        double noPermissionRate;
-        double disciplinePoints;
+    public static class AttendanceReportStatusDTO {
+        private int absent;
+        private int late;
+        private double noPermissionRate;
+        private double disciplinePoints;
     }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AttendanceReportResponse {
+        String userName;
+        String fullName;
+        AttendanceReportStatusDTO report;
+    }
+
 
 }
