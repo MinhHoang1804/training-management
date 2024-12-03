@@ -16,7 +16,7 @@ public class AttendanceResponse {
     @AllArgsConstructor
     @Builder
     public static class SearchResponse {
-        List<UserAttendanceResponse>listAttendances;
+        List<UserAttendanceResponse> listAttendances;
     }
 
     @Data
@@ -40,15 +40,15 @@ public class AttendanceResponse {
         private String className;
         List<UserAttendanceSubject> listSubjectTimeTable;
     }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     public static class UserAttendanceSubject {
         private String subjectName;
-        List<AttendanceStatusResponse>listWeeklyAttendances;
+        List<AttendanceStatusResponse> listWeeklyAttendances;
     }
-
 
 
     @Data
@@ -63,6 +63,17 @@ public class AttendanceResponse {
         private LocalDateTime endDate;
         private String trainer;
         private String location;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AttendanceStatusReportResponse {
+        int absent;
+        int late;
+        double noPermissionRate;
+        double disciplinePoints;
     }
 
 }

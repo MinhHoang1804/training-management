@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -124,4 +125,78 @@ public class AttendanceService implements IAttendanceService {
 
     }
 
+    @Override
+    public ApiResponse<AttendanceResponse.AttendanceStatusReportResponse> getAttendanceReport(Long userId, Long classId, Long subjectId) {
+        ApiResponse<AttendanceResponse.UserAttendanceResponse> userAttendance = getUserAttendance(userId, classId, subjectId);
+        if(userAttendance==null)  throw new AppException(HttpStatus.NOT_FOUND,ErrorCode.SCHEDULE_NOT_FOUND);
+
+        List<AttendanceStatus> list = userAttendance.getData().getLitAttendanceStatuses().stream().map(s -> s.getStatus()).collect(Collectors.toList());
+        int total = list.size();
+        int absent = calculateAbsent(list); //1
+        int late = calculateLate(list); //2
+        double noPermissionRate  = calculateNoPermissionRate(list);//3
+        double sample=((late * 1.0 / 2 + absent) /total); //4
+        double disciplinePoints = calculateDisciplinePoints(sample, noPermissionRate); //5
+        AttendanceResponse.AttendanceStatusReportResponse response =AttendanceResponse.AttendanceStatusReportResponse.builder()
+                .absent(absent).late(late).noPermissionRate(noPermissionRate).disciplinePoints(disciplinePoints)
+                .build();
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    public int calculateAbsent(List<AttendanceStatus> statuses) {
+        int absentCount = 0;
+        for (AttendanceStatus status : statuses) {
+            if (status == AttendanceStatus.A || status == AttendanceStatus.An) {
+                absentCount++;
+            }
+        }
+        return absentCount;
+    }
+
+    public int calculateLate(List<AttendanceStatus> statuses) {
+        int lateCount = 0;
+        for (AttendanceStatus status : statuses) {
+            if (status == AttendanceStatus.L || status == AttendanceStatus.Ln || status == AttendanceStatus.En) {
+                lateCount++;
+            }
+        }
+        return lateCount;
+    }
+
+    public double calculateNoPermissionRate(List<AttendanceStatus> statuses) {
+        int absentCount = calculateAbsent(statuses);
+        int lateCount = calculateLate(statuses);
+
+        int noPermissionCount = 0;
+        for (AttendanceStatus status : statuses) {
+            if (status == AttendanceStatus.An || status == AttendanceStatus.Ln || status == AttendanceStatus.En) {
+                noPermissionCount++;
+            }
+        }
+
+        int totalAttendance = absentCount + lateCount;
+        return totalAttendance > 0
+                ? (double) noPermissionCount * 100 / totalAttendance
+                : 0.0;
+    }
+
+    public double calculateDisciplinePoints(double sample, double noPermissionRate) {
+        if (sample <= 0.05) {
+            return 100.0; // 100% nếu sample <= 5%
+        } else if (sample <= 0.20) {
+            return 80.0; // 80% nếu sample <= 20%
+        } else if (sample <= 0.30) {
+            return 60.0; // 60% nếu sample <= 30%
+        } else if (sample < 0.50) {
+            return 50.0; // 50% nếu sample < 50%
+        } else if (sample >= 0.50 && noPermissionRate < 20.0) {
+            return 20.0; // 20% nếu sample >= 50% và noPermissionRate < 20%
+        } else if (sample >= 0.50 && noPermissionRate >= 20.0) {
+            return 0.0; // 0% nếu sample >= 50% và noPermissionRate >= 20%
+        }
+        else {
+            return 0.0;
+        }
+//        throw new IllegalArgumentException("Invalid input values for sample or noPermissionRate");
+    }
 }
