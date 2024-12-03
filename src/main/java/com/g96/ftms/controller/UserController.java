@@ -53,5 +53,9 @@ public class UserController {
     public ApiResponse<?> getSubjectList(@RequestBody UserRequest.UserPagingRequest model) {
         return userService.search(model);
     }
+    @PostMapping("/update-profile")
+    public ApiResponse<?> updateProfile(@RequestBody UserRequest.UserEditProfileRequest model) {
+        return userService.updateProfile(model);
+    }
 
 }

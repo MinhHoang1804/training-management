@@ -39,5 +39,7 @@ public interface UserService {
     ResponseEntity<?> addUser(UserDTO userDTO, Authentication authentication);
 
     ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model);
+
+    ApiResponse<?> updateProfile(UserRequest.UserEditProfileRequest model);
 }
 

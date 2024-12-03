@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -208,12 +209,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED);
         }
 
-//        if (userDTO.getFullName() == null || userDTO.getEmail() == null ||
-//                userDTO.getPhone() == null || userDTO.getAccount() == null ||
-//                userDTO.getPassword() == null || userDTO.getRoles() == null) {
-//            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT);
-//        }
-
         Set<Role> roles = userDTO.getRoles().stream()
                 .map(roleName -> roleRepository.findByRoleName(roleName)
                         .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT)))
@@ -241,22 +236,28 @@ public class UserServiceImpl implements UserService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
-//    @Override
-//    public ResponseEntity<?> logout(HttpServletRequest request) {
-//        String token = jwtTokenProvider.resolveToken(request);
-//
-//        if (token != null && jwtTokenProvider.validateToken(token)) {
-//            // Lấy thời gian hết hạn của token
-//            long expirationTime = jwtTokenProvider.getExpirationDateFromToken(token) - System.currentTimeMillis();
-//
-//            // Thêm token vào danh sách thu hồi
-//            tokenStore.revokeToken(token, expirationTime);
-//
-//            return ResponseEntity.ok("Logout successful");
-//        } else {
-//            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_TOKEN);
-//        }
-//    }
+    @Override
+    public ApiResponse<?> updateProfile(UserRequest.UserEditProfileRequest model) {
+        // Lấy thông tin người dùng hiện tại từ SecurityContext
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByAccount(currentUsername);
+        if(user==null){
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
+        }
+//                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+
+        // Cập nhật thông tin từ model
+        if (model.getPhone() != null) user.setPhone(model.getPhone());
+        if (model.getEmergencyPhone() != null) user.setEmergencyPhone(model.getEmergencyPhone());
+        if (model.getAddress() != null) user.setAddress(model.getAddress());
+        if (model.getDateOfBirth() != null) user.setDateOfBirth(model.getDateOfBirth());
+
+        // Lưu lại thông tin đã được cập nhật
+        userRepository.save(user);
+
+        // Tạo response
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+    }
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
