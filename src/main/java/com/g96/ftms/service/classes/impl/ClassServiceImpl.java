@@ -222,7 +222,9 @@ public class ClassServiceImpl implements IClassService {
     public ApiResponse<?> getClassUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
         List<Class> list = user.getUserClassRelationList().stream().map(UserClassRelation::getClasss).toList();
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);
+        List<ClassReponse.ClassInforDTO> response = mapper.map(list, new TypeToken<List<ClassReponse.ClassInforDTO>>() {
+        }.getType());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
     public void generateAttendanceList(List<ScheduleDetail> scheduleDetails, List<Long> userIds) {
