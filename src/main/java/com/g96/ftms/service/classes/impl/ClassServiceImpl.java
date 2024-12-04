@@ -207,6 +207,7 @@ public class ClassServiceImpl implements IClassService {
         Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         c.setStatus(true);
+        classRepository.save(c);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), c);
     }
 
