@@ -42,4 +42,14 @@ public class GradeController {
     public ApiResponse<?> getSchemeInSubjectClass(@RequestBody SchemeRequest.SchemeClassSubjectRequest model) {
         return markSchemeService.getSchemeInSubjectClass(model);
     }
+
+    @PostMapping("/search-trainee-pass")
+    public ApiResponse<?> getTraineePassList(@RequestBody GradeRequest.GradePagingRequest model) {
+        return gradeService.searchTraineePassed(model);
+    }
+
+    @PostMapping("/get-trainee-pass")
+    public ApiResponse<?> getTraineePass(@RequestBody GradeRequest.UserGradePassRequest model) {
+        return gradeService.getGradeSumary(model.getUserName(),model.getClassId());
+    }
 }

@@ -132,4 +132,7 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonBackReference
     List<Attendance> adAttendanceList;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<GradeSummary> gradeSummaryList;
 }

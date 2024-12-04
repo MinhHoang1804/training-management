@@ -10,6 +10,7 @@ import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.feedback.IFeedBackService;
+import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,8 @@ public class FeedbackService implements IFeedBackService {
 
     @Override
     public ApiResponse<PagedResponse<FeedBackResponse.FeedBackInfoDTO>> search(FeedBackRequest.FeedBackPagingRequest model) {
-        Page<FeedBack> pages = feedBackRepository.searchFilter(model.getKeyword(), model.getUserId(), model.getSubjectId(), model.getClassId(), model.getPageable());
+        String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
+        Page<FeedBack> pages = feedBackRepository.searchFilter(keywordFilter, model.getUserId(), model.getSubjectId(), model.getClassId(), model.getPageable());
         List<FeedBackResponse.FeedBackInfoDTO> list = pages.getContent().stream().map(f -> {
             return FeedBackResponse
                     .FeedBackInfoDTO.builder().feedbackId(f.getFeedbackId())

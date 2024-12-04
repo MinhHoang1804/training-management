@@ -15,4 +15,8 @@ public interface IGradeService {
     ApiResponse<?> saveGradeSetting(GradeRequest.GradeSettingUpdateRequest model);
 
     ApiResponse<?> addGradeForTrainee(List<GradeRequest.GradedSubjectAddRequest> model);
+
+    ApiResponse<GradeResponse.GradeSummaryInfoResponse> getGradeSumary(String userName, Long classId);
+
+    ApiResponse<PagedResponse<GradeResponse.GradeSummaryInfoResponse>> searchTraineePassed(GradeRequest.GradePagingRequest model);
 }

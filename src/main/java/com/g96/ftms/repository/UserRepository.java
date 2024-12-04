@@ -47,4 +47,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("roleName") String roleName,
             @Param("traineeUnAvailable") List<String> traineeUnAvailable
     );
+
+    @Query("SELECT u FROM User u JOIN u.gradeSummaryList g " +
+            "WHERE " +
+            "g.isPassed=true " +
+            "AND g.classs.classId= :classId " +
+            "AND (:keywordFilter IS NULL OR (u.account LIKE :keywordFilter OR u.email LIKE :keywordFilter OR u.phone LIKE :keywordFilter)) " +
+            "AND (:status IS NULL OR u.status= :status) ")
+    Page<User> searchUserPass(@Param("keywordFilter") String keywordFilter,
+                            @Param("status") Boolean status,
+                            @Param("classId") Long classId,
+                            Pageable pageable);
 }

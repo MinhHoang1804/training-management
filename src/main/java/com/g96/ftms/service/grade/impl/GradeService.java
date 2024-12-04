@@ -11,6 +11,7 @@ import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.grade.IGradeService;
+import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -35,11 +36,11 @@ public class GradeService implements IGradeService {
     private final SubjectRepository subjectRepository;
     private final MarkSchemeRepository markSchemeRepository;
     private final ModelMapper mapper;
+    private final GradeSummaryRepository gradeSummaryRepository;
 
     @Override
     public ApiResponse<PagedResponse<GradeResponse.GradeInfoDTO>> search(GradeRequest.GradePagingRequest model) {
         List<GradeResponse.GradeInfoDTO> list = new ArrayList<>();
-
         // Tìm danh sách `User` trong class với `Pageable`
         Page<User> pages = userRepository.findUsersByClassId(model.getClassId(), model.getPageable());
 
@@ -114,6 +115,50 @@ public class GradeService implements IGradeService {
 
     }
 
+    @Override
+    public ApiResponse<GradeResponse.GradeSummaryInfoResponse> getGradeSumary(String userName, Long classId) {
+        User user = userRepository.findByAccount(userName);
+        if(user==null){
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
+        }
+
+        Class c = classRepository.findById(classId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+
+        GradeSummary gradeSummary = gradeSummaryRepository.findByUser_UserIdAndClasss_ClassId(user.getUserId(), c.getClassId());
+        GradeResponse.GradeSummaryInfoResponse response= GradeResponse.GradeSummaryInfoResponse.builder()
+                .fullName(user.getFullName())
+                .userName(user.getAccount())
+                .grade(gradeSummary.getGrade())
+                .comment(gradeSummary.getComment())
+                .isPassed(gradeSummary.getIsPassed())
+                .ranking(getRanking(gradeSummary.getGrade()))
+                .build();
+
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    @Override
+    public ApiResponse<PagedResponse<GradeResponse.GradeSummaryInfoResponse>> searchTraineePassed(GradeRequest.GradePagingRequest model) {
+        String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
+        Page<User> users = userRepository.searchUserPass(keywordFilter, model.getStatus(),model.getClassId(), model.getPageable());
+        List<GradeResponse.GradeSummaryInfoResponse>list=new ArrayList<>();
+        for (User u:users.getContent()){
+            GradeResponse.GradeSummaryInfoResponse gradeSummary = getGradeSumary(u.getAccount(), model.getClassId()).getData();
+            list.add(gradeSummary);
+        }
+
+        PagedResponse<GradeResponse.GradeSummaryInfoResponse> response = new PagedResponse<>(
+                list,
+                users.getNumber(),
+                users.getSize(),
+                users.getTotalElements(),
+                users.getTotalPages(),
+                users.isLast()
+        );
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
     public void addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model) {
         User user = userRepository.findByAccount(model.getUser());
         if (user == null) {
@@ -147,32 +192,8 @@ public class GradeService implements IGradeService {
 
     // Service để lấy điểm của một người dùng
     public GradeResponse.GradeInfoDTO getGradesByUserId(Long userId, Long classId) {
-//        // Lấy danh sách điểm của người dùng (userId)
-//        List<Grade> userGrades = gradeRepository.findByUser_UserIdAndClasss_ClassId(userId, classId);
-//
-//        if (userGrades.isEmpty()) {
-//            return null; // Hoặc có thể trả về ngoại lệ tùy theo yêu cầu
-//        }
-//
         // Lấy thông tin người dùng từ danh sách điểm
         User user = userRepository.findById(userId).orElse(null);
-//
-//        // Nhóm các bản ghi `Grade` theo `subject` và tính tổng điểm theo trọng số cho từng môn học
-//        Map<String, Double> subjectTotals = userGrades.stream()
-//                .collect(Collectors.groupingBy(
-//                        grade -> grade.getSubject().getSubjectName(),
-//                        Collectors.summingDouble(grade -> grade.getGrade() * grade.getMarkScheme().getMarkWeight())
-//                ));
-//
-//        // Chuyển đổi Map thành danh sách `GradeComponent`, mỗi `GradeComponent` đại diện cho một môn học
-//        List<GradeResponse.GradeComponent> gradeComponents = subjectTotals.entrySet().stream()
-//                .map(entry -> new GradeResponse.GradeComponent(entry.getKey(), entry.getValue()))
-//                .collect(Collectors.toList());
-
-        // Tính tổng điểm trung bình của người dùng này qua tất cả các môn học
-//        double total = subjectTotals.values().stream().mapToDouble(Double::doubleValue).sum() / subjectTotals.size();
-
-        // Trả về đối tượng GradeInfoDTO chứa thông tin của người dùng và danh sách điểm theo môn học
         List<GradeResponse.GradeComponent> gradeComponents = getSchemeGrade(userId, classId);
         OptionalDouble average = gradeComponents.stream().mapToDouble(GradeResponse.GradeComponent::getGrade).average();
         double total = 0;
@@ -186,7 +207,6 @@ public class GradeService implements IGradeService {
                 .total(total)
                 .build();
     }
-
 
     public List<GradeResponse.GradeComponent> getSchemeGrade(Long userId, Long classId) {
         List<GradeResponse.GradeComponent> list = new ArrayList<>();
@@ -228,5 +248,19 @@ public class GradeService implements IGradeService {
         }
 
         return list;
+    }
+
+    public String getRanking(Double grade){
+        if(grade>=9.3){
+            return "A+";
+        } else if (grade>=8.5) {
+            return "A";
+        }else if(grade>=7.2){
+            return "B";
+        }else if(grade>=6){
+            return "C";
+        }else {
+            return "D";
+        }
     }
 }

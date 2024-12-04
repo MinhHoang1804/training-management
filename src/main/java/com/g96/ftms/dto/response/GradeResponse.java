@@ -45,5 +45,17 @@ public class GradeResponse {
         private LocalDateTime lastUpdate;
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    @Builder
+    public static class GradeSummaryInfoResponse {
+       private String userName;
+       private String fullName;
+       private String comment;
+       private Double grade;
+       private Boolean isPassed;
+       private String ranking;
+    }
 
 }

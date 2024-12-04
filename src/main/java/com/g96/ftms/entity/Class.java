@@ -78,5 +78,8 @@ public class Class {
     @ManyToOne
     @JoinColumn(name = "generation_id")
     private Generation generation;
+
+    @OneToMany(mappedBy = "classs", fetch = FetchType.LAZY)
+    private List<GradeSummary> gradesSummaryList;
 }
 

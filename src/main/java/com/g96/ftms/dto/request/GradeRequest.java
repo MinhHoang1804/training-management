@@ -51,4 +51,11 @@ public class GradeRequest {
         private String markName;
         private Double markWeight;
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class UserGradePassRequest {
+        private String userName;
+        private Long classId;
+    }
 }
