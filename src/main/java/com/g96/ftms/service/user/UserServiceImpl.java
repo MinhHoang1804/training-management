@@ -9,7 +9,6 @@ import com.g96.ftms.dto.request.UserRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.UserResponse;
 import com.g96.ftms.entity.Role;
-import com.g96.ftms.entity.Subject;
 import com.g96.ftms.entity.User;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
@@ -17,10 +16,11 @@ import com.g96.ftms.mapper.Mapper;
 import com.g96.ftms.repository.RoleRepository;
 import com.g96.ftms.repository.UserRepository;
 import com.g96.ftms.security.JwtTokenProvider;
+import com.g96.ftms.service.file.IImageStorageService;
+import com.g96.ftms.util.constants.CONTAINER_UPLOAD_ENUM;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,6 +56,8 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final ModelMapper mapper;
+
+    private final IImageStorageService imageStorageService;
 
     @Override
     public User findByAccount(String account) {
@@ -225,7 +230,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model) {
-        String keywordFilter= model.getKeyword()==null?null:"%"+ model.getKeyword()+"%";
+        String keywordFilter = model.getKeyword() == null ? null : "%" + model.getKeyword() + "%";
         Page<User> pages = userRepository.searchFilter(keywordFilter, model.getStatus(), model.getRoleId(), model.getPageable());
         List<UserResponse.UserInfoDTO> list = pages.getContent().stream().map(item -> {
             UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
@@ -239,11 +244,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiResponse<?> updateProfile(UserRequest.UserEditProfileRequest model) {
         // Lấy thông tin người dùng hiện tại từ SecurityContext
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByAccount(currentUsername);
-        if(user==null){
-            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
-        }
+        User user = getCurrentUser();
 //                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         // Cập nhật thông tin từ model
@@ -259,6 +260,31 @@ public class UserServiceImpl implements UserService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
     }
 
+    @Override
+    public ApiResponse<?> updateAvatar(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            String imageUrl = this.imageStorageService.uploadImage(CONTAINER_UPLOAD_ENUM.AVATAR.getValue(), file.getOriginalFilename(), inputStream, file.getSize());
+            User user = getCurrentUser();
+            user.setImgAva(imageUrl);
+            userRepository.save(user);
+            return new ApiResponse(HttpStatus.OK.toString(), imageUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.FILE_WRONG_FORMAT);
+        } catch (AppException e) {
+            throw e;
+        }
+    }
+
+    public User getCurrentUser() {
+        // Lấy thông tin người dùng hiện tại từ SecurityContext
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByAccount(currentUsername);
+        if (user == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SESSION_EXPIRED);
+        }
+        return user;
+    }
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

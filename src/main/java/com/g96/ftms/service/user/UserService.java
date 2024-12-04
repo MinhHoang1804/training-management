@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -41,5 +42,7 @@ public interface UserService {
     ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model);
 
     ApiResponse<?> updateProfile(UserRequest.UserEditProfileRequest model);
+
+    ApiResponse<?> updateAvatar(MultipartFile file);
 }
 
