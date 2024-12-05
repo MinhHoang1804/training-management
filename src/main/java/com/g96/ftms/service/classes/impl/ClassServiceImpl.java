@@ -62,8 +62,11 @@ public class ClassServiceImpl implements IClassService {
 
         Class c = classRepository.findById(classId).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
-
+        Generation generation = c.getGeneration();
         ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
+        if(generation != null) {
+            response.setGenerationName(generation.getGenerationName());
+        }
         if (c.getCurriculum() != null) {
             response.setCurriculumName(c.getCurriculum().getCurriculumName());
         }
