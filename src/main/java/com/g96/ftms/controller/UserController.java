@@ -29,6 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getLoggedInUserProfile(Authentication authentication) {
         String account = authentication.getName();
@@ -49,6 +50,7 @@ public class UserController {
         UserDTO userDTO = userService.getUserDetails(userId, authentication);
         return ResponseEntity.ok(userDTO);
     }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/management/add")
     public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userDTO, Authentication authentication) {
@@ -59,14 +61,20 @@ public class UserController {
     public ApiResponse<?> getSubjectList(@RequestBody UserRequest.UserPagingRequest model) {
         return userService.search(model);
     }
+
     @PostMapping("/update-profile")
     public ApiResponse<?> updateProfile(@RequestBody UserRequest.UserEditProfileRequest model) {
         return userService.updateProfile(model);
     }
 
-    @PostMapping(value = "/upload-avatar",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<?> uploadImage(@RequestParam MultipartFile file) throws IOException {
         return userService.updateAvatar(file);
+    }
+
+    @GetMapping("/get-admin-class")
+    public ApiResponse<?> getAdmin() {
+        return userService.findAdmin();
     }
 
 }

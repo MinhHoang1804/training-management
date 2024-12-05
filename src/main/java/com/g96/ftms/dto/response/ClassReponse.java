@@ -16,6 +16,7 @@ public class ClassReponse {
         private Long classId;
         private String classCode;
         private String descriptions;
+        private Integer planTraineeNo;
         private Boolean status;
         private String admin;
         private LocalDateTime endDate ;

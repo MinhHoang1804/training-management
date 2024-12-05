@@ -276,6 +276,17 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public ApiResponse<List<UserResponse.UserInfoDTO>> findAdmin() {
+        List<User> list = userRepository.findByRole("ROLE_CLASS_ADMIN");
+        List<UserResponse.UserInfoDTO> response = list.stream().map(item -> {
+            UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
+            map.setRole(item.getRole());
+            return map;
+        }).toList();
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
     public User getCurrentUser() {
         // Lấy thông tin người dùng hiện tại từ SecurityContext
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();

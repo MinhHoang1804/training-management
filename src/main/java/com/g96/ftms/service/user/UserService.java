@@ -44,5 +44,7 @@ public interface UserService {
     ApiResponse<?> updateProfile(UserRequest.UserEditProfileRequest model);
 
     ApiResponse<?> updateAvatar(MultipartFile file);
+
+    ApiResponse<List<UserResponse.UserInfoDTO>> findAdmin();
 }
 
