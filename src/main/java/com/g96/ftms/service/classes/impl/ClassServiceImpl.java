@@ -12,6 +12,7 @@ import com.g96.ftms.repository.*;
 import com.g96.ftms.service.classes.IClassService;
 import com.g96.ftms.service.email.EmailService;
 import com.g96.ftms.service.schedule.IScheduleService;
+import com.g96.ftms.service.user.UserService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import com.g96.ftms.util.constants.AttendanceStatus;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class ClassServiceImpl implements IClassService {
     private final EmailService emailService;
     private final AttendanceRepository attendanceRepository;
 
+    private final UserService userService;
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
@@ -97,14 +99,16 @@ public class ClassServiceImpl implements IClassService {
         Curriculum curriculum = curriculumRepository.findById(model.getCurriculumId())
                 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
         map.setCurriculum(curriculum);
+
+        User currentUser = userService.getCurrentUser();
+        map.setManager(currentUser.getAccount());
         //save entity
         Class classSave = classRepository.save(map);
 
         try {
-            emailService.sendMailForCreateClassRequest("Admin", user.getEmail(), user.getFullName(), map.getClassCode(), map.getClassId());
+            emailService.sendMailForCreateClassRequest(currentUser.getFullName(), user.getEmail(), user.getFullName(), map.getClassCode(), map.getClassId());
         } catch (Exception e) {
             e.printStackTrace();
-            ;
         }
         //create schedule
 //        List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
@@ -137,6 +141,8 @@ public class ClassServiceImpl implements IClassService {
         Class c = classRepository.findById(model.getClassId()).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         User user = userRepository.findByAccount(c.getAdmin());
+        User manager = userRepository.findByAccount(c.getManager());
+
         Generation generation = generationRepository.findById(model.getGenerationId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.GENERATION_NOT_FOUND));
         Location location = locationRepository.findById(model.getLocationId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.LOCATION_NOT_FOUND));
         c.setGeneration(generation);
@@ -198,7 +204,7 @@ public class ClassServiceImpl implements IClassService {
 
         generateAttendanceList(scheduleDetailList, list);
         try {
-            emailService.sendMailToAcceptRequest("Admin", user.getEmail(), user.getFullName(), c.getClassCode(), c.getClassId());
+            emailService.sendMailToAcceptRequest(user.getFullName(), manager.getEmail(), manager.getFullName(), c.getClassCode(), c.getClassId());
         } catch (Exception E) {
             E.printStackTrace();
         }

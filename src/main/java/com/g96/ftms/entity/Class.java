@@ -50,6 +50,8 @@ public class Class {
     @Column(name="plan_Trainee_no")
     private Integer planTraineeNo;
 
+    @Column(name="manager")
+    private String manager;
 
     @ManyToOne
     @JoinColumn(name = "location_id")

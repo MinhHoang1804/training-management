@@ -52,4 +52,9 @@ public class GradeController {
     public ApiResponse<?> getTraineePass(@RequestBody GradeRequest.UserGradePassRequest model) {
         return gradeService.getGradeSumary(model.getUserName(),model.getClassId());
     }
+
+    @PostMapping("/get-grade-trainee")
+    public ApiResponse<?> getGradeTrainee(@RequestBody GradeRequest.UserGradePassRequest model) {
+        return gradeService.getGradeTrainee(model.getUserName(),model.getClassId());
+    }
 }

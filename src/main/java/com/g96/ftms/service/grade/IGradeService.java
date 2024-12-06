@@ -19,4 +19,6 @@ public interface IGradeService {
     ApiResponse<GradeResponse.GradeSummaryInfoResponse> getGradeSumary(String userName, Long classId);
 
     ApiResponse<PagedResponse<GradeResponse.GradeSummaryInfoResponse>> searchTraineePassed(GradeRequest.GradePagingRequest model);
+
+    ApiResponse<?> getGradeTrainee(String userName, Long classId);
 }

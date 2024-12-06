@@ -287,6 +287,7 @@ public class UserServiceImpl implements UserService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
+    @Override
     public User getCurrentUser() {
         // Lấy thông tin người dùng hiện tại từ SecurityContext
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();

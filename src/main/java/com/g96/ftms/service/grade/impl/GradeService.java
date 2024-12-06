@@ -159,6 +159,11 @@ public class GradeService implements IGradeService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
+    @Override
+    public ApiResponse<?> getGradeTrainee(String userName, Long classId) {
+        return null;
+    }
+
     public void addGradeForTrainee(GradeRequest.GradedSubjectAddRequest model) {
         User user = userRepository.findByAccount(model.getUser());
         if (user == null) {

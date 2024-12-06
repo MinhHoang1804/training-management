@@ -46,5 +46,7 @@ public interface UserService {
     ApiResponse<?> updateAvatar(MultipartFile file);
 
     ApiResponse<List<UserResponse.UserInfoDTO>> findAdmin();
+
+    public User getCurrentUser();
 }
 
