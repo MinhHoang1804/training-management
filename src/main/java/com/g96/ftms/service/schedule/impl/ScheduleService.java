@@ -42,9 +42,10 @@ public class ScheduleService implements IScheduleService {
             // Alternatively, set a custom time: currentDate.atTime(LocalTime.of(10, 0)); // 10:00 AM
 
             map.setDate(dateTime); // Assuming your `ScheDuleDetailsInfo` has a LocalDateTime field `dateTime`
-
-            ScheduleResponse.TimeSlotInfo timeSlot = ScheduleResponse.TimeSlotInfo.getTimeSlot(slot);
-            map.setDate(timeSlot.getStartDate());
+                dateTime.toLocalDate();
+            ScheduleResponse.TimeSlotInfo timeSlot = ScheduleResponse.TimeSlotInfo.getTimeSlot(slot,dateTime.toLocalDate());
+//            map.setDate(timeSlot.getStartDate());
+            map.setStartDate(timeSlot.getStartDate());
             map.setEndDate(timeSlot.getEndDate());
             // Add schedule detail to the result list
             list.add(map);

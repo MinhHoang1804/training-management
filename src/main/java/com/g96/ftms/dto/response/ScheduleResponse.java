@@ -31,27 +31,26 @@ public class ScheduleResponse {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
 
-        public static TimeSlotInfo getTimeSlot(int slot) {
-            LocalDate today = LocalDate.now();
+        public static TimeSlotInfo getTimeSlot(int slot,LocalDate date) {
             LocalDateTime startDateTime;
             LocalDateTime endDateTime;
 
             switch (slot) {
                 case 1:
-                    startDateTime = today.atTime(LocalTime.of(7, 30));
-                    endDateTime = today.atTime(LocalTime.of(9, 0));
+                    startDateTime = date.atTime(LocalTime.of(7, 30));
+                    endDateTime = date.atTime(LocalTime.of(9, 0));
                     break;
                 case 2:
-                    startDateTime = today.atTime(LocalTime.of(9, 30));
-                    endDateTime = today.atTime(LocalTime.of(11, 0));
+                    startDateTime = date.atTime(LocalTime.of(9, 30));
+                    endDateTime = date.atTime(LocalTime.of(11, 0));
                     break;
                 case 3:
-                    startDateTime = today.atTime(LocalTime.of(13, 0)); // 1h chiều
-                    endDateTime = today.atTime(LocalTime.of(14, 30));
+                    startDateTime = date.atTime(LocalTime.of(13, 0)); // 1h chiều
+                    endDateTime = date.atTime(LocalTime.of(14, 30));
                     break;
                 case 4:
-                    startDateTime = today.atTime(LocalTime.of(15, 0)); // 3h chiều
-                    endDateTime = today.atTime(LocalTime.of(16, 30));
+                    startDateTime = date.atTime(LocalTime.of(15, 0)); // 3h chiều
+                    endDateTime = date.atTime(LocalTime.of(16, 30));
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid slot: " + slot);
