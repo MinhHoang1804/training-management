@@ -71,6 +71,7 @@ public class ClassServiceImpl implements IClassService {
         }
         if (c.getCurriculum() != null) {
             response.setCurriculumName(c.getCurriculum().getCurriculumName());
+            response.setCurriculumId(c.getCurriculum().getCurriculumId());
         }
         if (c.getLocation() != null) {
             response.setLocationName(c.getLocation().getLocationName());

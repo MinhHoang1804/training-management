@@ -24,6 +24,7 @@ public class ClassReponse {
         private LocalDateTime createdDate;
         private String locationName;
         private String curriculumName;
+        private Long curriculumId;
         private String generationName;
     }
 
