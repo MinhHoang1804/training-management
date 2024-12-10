@@ -15,6 +15,7 @@ import com.g96.ftms.service.schedule.IScheduleService;
 import com.g96.ftms.service.user.UserService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import com.g96.ftms.util.constants.AttendanceStatus;
+import com.g96.ftms.util.constants.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -48,7 +49,20 @@ public class ClassServiceImpl implements IClassService {
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
-        Page<Class> pages = classRepository.searchFilter(keywordFilter, model.getStatus(), model.getPageable());
+        Page<Class> pages = null;
+        User currentUser = userService.getCurrentUser();
+        if(currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_CLASS_ADMIN.getValue())){
+            pages=classRepository.searchFilterByAdmin(keywordFilter, model.getStatus(),currentUser.getAccount(), model.getPageable());
+        }
+        else if(currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_MANAGER.getValue())){
+            pages=classRepository.searchFilterByManager(keywordFilter, model.getStatus(),currentUser.getAccount(), model.getPageable());
+        }
+        else if(currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_ADMIN.getValue())){
+            pages=classRepository.searchFilter(keywordFilter, model.getStatus(),model.getPageable());
+        }else{
+            throw new AppException(HttpStatus.FORBIDDEN,ErrorCode.FORBIDDEN);
+        }
+
         List<ClassReponse.ClassInforDTO> collect = pages.getContent().stream().map(s -> {
             return mapper.map(s, ClassReponse.ClassInforDTO.class);
         }).collect(Collectors.toList());
