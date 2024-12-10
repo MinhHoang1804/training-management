@@ -159,6 +159,8 @@ public class ClassServiceImpl implements IClassService {
         //create schedule
         List<Subject> subjectsInCurriculum = subjectRepository.findDistinctByCurriculumSubjectRelationList_Curriculum_CurriculumId(model.getCurriculumId());
         List<Schedule> scheduleList = new ArrayList<>();
+
+        //clear all old schedule
         for (Subject subject : subjectsInCurriculum) {
 
             ClassRequest.SubjectTraineeDto cst = model.getSubjectList().stream()

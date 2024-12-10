@@ -27,4 +27,12 @@ public interface SettingsRepository extends JpaRepository<Settings, Long> {
     );
 
     Settings findByDescription(String description);
+
+    boolean existsByGeneration_GenerationName(String generationName);
+
+    boolean existsByLocation_LocationName(String locationName);
+
+    boolean existsByLocation_LocationNameAndSettingIdNot(String locationName, Long settingId);
+
+    boolean existsByGeneration_GenerationNameAndSettingIdNot(String generationName, Long settingId);
 }
