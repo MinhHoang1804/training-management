@@ -59,4 +59,10 @@ public class SubjectController {
     public ApiResponse<Subject> updateSubject(@RequestBody SubjectRequest.SubjectEditRequest model) {
         return subjectService.updateSubject(model);
     }
+
+
+    @GetMapping("/check-update/{id}")
+    public ApiResponse<?> checkUpdate(@PathVariable("id") Long subjectId) {
+        return subjectService.checkUpdate(subjectId);
+    }
 }

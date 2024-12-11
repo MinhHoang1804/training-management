@@ -21,4 +21,5 @@ public interface ISubjectService {
     //get subject for option
     ApiResponse<List<SubjectResponse.SubjectOptionDTO>> getAllSubjectOption();
     public List<Subject>getSubjectInClass(Long classId);
+    public ApiResponse<?>checkUpdate(Long subjectId);
 }

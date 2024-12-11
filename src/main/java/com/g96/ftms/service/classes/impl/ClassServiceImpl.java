@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -252,6 +253,12 @@ public class ClassServiceImpl implements IClassService {
         List<ClassReponse.ClassInforDTO> response = mapper.map(list, new TypeToken<List<ClassReponse.ClassInforDTO>>() {
         }.getType());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    @Override
+    public ApiResponse<?> checkClassInTime(Long classId) {
+        Boolean check = classRepository.checkClassInTime(classId, LocalDateTime.now());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
     }
 
     public void generateAttendanceList(List<ScheduleDetail> scheduleDetails, List<Long> userIds) {

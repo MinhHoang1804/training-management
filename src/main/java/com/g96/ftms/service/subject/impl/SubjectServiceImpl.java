@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -152,6 +153,20 @@ public class SubjectServiceImpl implements ISubjectService {
         return c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
     }
 
+    @Override
+    public ApiResponse<?> checkUpdate(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        List<Class> collect = subject.getSchedules().stream().map(Schedule::getClasss).collect(Collectors.toList());
+        boolean check=true;
+        for (Class c:collect) {
+            Boolean ck = classRepository.checkClassInTime(c.getClassId(), LocalDateTime.now());
+            if(ck){ //have class in time
+                check=false;
+            }
+        }
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
+    }
 
 
 }

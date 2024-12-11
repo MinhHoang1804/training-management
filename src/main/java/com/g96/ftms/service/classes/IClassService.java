@@ -27,4 +27,5 @@ public interface IClassService {
 
     ApiResponse<?> getClassUser(Long userId);
 
+    ApiResponse<?> checkClassInTime(Long classId);
 }
