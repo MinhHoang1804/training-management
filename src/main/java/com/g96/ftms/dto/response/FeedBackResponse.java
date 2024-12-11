@@ -32,6 +32,7 @@ public class FeedBackResponse {
         private Long feedbackId;
         private String traineeName;
         private String trainerName;
+        private String adminName;
         private Long traineeId;
         private Long trainerId;
         private String subjectCode;

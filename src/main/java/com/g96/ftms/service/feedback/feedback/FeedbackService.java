@@ -12,6 +12,7 @@ import com.g96.ftms.repository.*;
 import com.g96.ftms.service.feedback.IFeedBackService;
 import com.g96.ftms.util.SqlBuilderUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -61,8 +62,18 @@ public class FeedbackService implements IFeedBackService {
                 .collect(Collectors.toList());
 
         //get trainer
-        User trainer = userRepository.findByAccount(feedback.getClasss().getAdmin());
+        Class classs = feedback.getClasss();
+        Schedule schedule = classs.getSchedules().stream().filter(s -> s.getSubject().getSubjectId() == feedback.getSubject().getSubjectId()).findFirst().orElse(null);
+        User trainer = null;
+        if(schedule != null&& !StringUtils.isEmpty(schedule.getTrainer())) {
+            trainer=userRepository.findByAccount(schedule.getTrainer());
+        }
         if (trainer == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
+        }
+        //get admin
+        User admin = userRepository.findByAccount(classs.getAdmin());
+        if (admin == null) {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND);
         }
         // Tạo đối tượng FeedBackFormDTO với các trường cần thiết
@@ -72,6 +83,7 @@ public class FeedbackService implements IFeedBackService {
                 .traineeId(feedback.getUser().getUserId())
                 .trainerName(trainer.getFullName())
                 .trainerId(trainer.getUserId())
+                .adminName(admin.getAccount())
                 .subjectCode(feedback.getSubject().getSubjectCode())
                 .subjectName(feedback.getSubject().getSubjectName())
                 .avgRating(feedback.getAvgRating())
