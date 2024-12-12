@@ -48,21 +48,20 @@ public class ClassServiceImpl implements IClassService {
     private final AttendanceRepository attendanceRepository;
 
     private final UserService userService;
+
     @Override
     public ApiResponse<PagedResponse<ClassReponse.ClassInforDTO>> search(ClassRequest.ClassPagingRequest model) {
         String keywordFilter = SqlBuilderUtils.createKeywordFilter(model.getKeyword());
         Page<Class> pages = null;
         User currentUser = userService.getCurrentUser();
-        if(currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_CLASS_ADMIN.getValue())){
-            pages=classRepository.searchFilterByAdmin(keywordFilter, model.getStatus(),currentUser.getAccount(), model.getPageable());
-        }
-        else if(currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_MANAGER.getValue())){
-            pages=classRepository.searchFilterByManager(keywordFilter, model.getStatus(),currentUser.getAccount(), model.getPageable());
-        }
-        else if(currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_ADMIN.getValue())){
-            pages=classRepository.searchFilter(keywordFilter, model.getStatus(),model.getPageable());
-        }else{
-            throw new AppException(HttpStatus.FORBIDDEN,ErrorCode.FORBIDDEN);
+        if (currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_CLASS_ADMIN.getValue())) {
+            pages = classRepository.searchFilterByAdmin(keywordFilter, model.getStatus(), currentUser.getAccount(), model.getPageable());
+        } else if (currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_MANAGER.getValue())) {
+            pages = classRepository.searchFilterByManager(keywordFilter, model.getStatus(), currentUser.getAccount(), model.getPageable());
+        } else if (currentUser.getRoleNames().equalsIgnoreCase(RoleEnum.ROLE_ADMIN.getValue())) {
+            pages = classRepository.searchFilter(keywordFilter, model.getStatus(), model.getPageable());
+        } else {
+            throw new AppException(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN);
         }
 
         List<ClassReponse.ClassInforDTO> collect = pages.getContent().stream().map(s -> {
@@ -82,7 +81,7 @@ public class ClassServiceImpl implements IClassService {
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         Generation generation = c.getGeneration();
         ClassReponse.ClassInforDTO response = mapper.map(c, ClassReponse.ClassInforDTO.class);
-        if(generation != null) {
+        if (generation != null) {
             response.setGenerationName(generation.getGenerationName());
         }
         if (c.getCurriculum() != null) {
@@ -178,6 +177,10 @@ public class ClassServiceImpl implements IClassService {
 
         //clear all old schedule
         for (Subject subject : subjectsInCurriculum) {
+            deleteSchedulesBySubjectAndClass(subject.getSubjectId(),c.getClassId());
+        }
+        //add new schedule
+        for (Subject subject : subjectsInCurriculum) {
 
             ClassRequest.SubjectTraineeDto cst = model.getSubjectList().stream()
                     .filter(a -> subject.getSubjectId().equals(a.getSubjectId())) // Replace `subjectId` with the desired ID to match
@@ -264,6 +267,13 @@ public class ClassServiceImpl implements IClassService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
     }
 
+    @Override
+    @Transactional
+    public void deleteSchedulesBySubjectAndClass(Long subjectId, Long classId) {
+        List<Schedule> schedules = scheduleRepository.findByClasss_ClassIdAndSubject_SubjectId(classId, subjectId);
+        scheduleRepository.deleteAll(schedules);
+    }
+
     public void generateAttendanceList(List<ScheduleDetail> scheduleDetails, List<Long> userIds) {
         List<Attendance> attendanceList = new ArrayList<>();
         for (Long userId : userIds) {
@@ -282,4 +292,5 @@ public class ClassServiceImpl implements IClassService {
 
         attendanceRepository.saveAll(attendanceList);
     }
+
 }

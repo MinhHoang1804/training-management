@@ -28,4 +28,6 @@ public interface IClassService {
     ApiResponse<?> getClassUser(Long userId);
 
     ApiResponse<?> checkClassInTime(Long classId);
+
+    public void deleteSchedulesBySubjectAndClass(Long subjectId, Long classId);
 }

@@ -56,7 +56,7 @@ public class ScheduleDetail {
     @JsonBackReference
     private Schedule schedule;
 
-    @OneToMany(mappedBy = "scheduleDetail", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "scheduleDetail", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     List<Attendance> adAttendanceList;
 }
