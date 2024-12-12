@@ -48,6 +48,9 @@ public class ScheduleDetail {
     @Column
     private Integer slot;
 
+    @Column
+    private String trainer;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id")
     @JsonBackReference

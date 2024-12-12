@@ -42,6 +42,8 @@ public interface ClassRepository extends JpaRepository<Class, Long> {
                                       @Param("username") String username,
                                       Pageable pageable);
 
-    @Query("SELECT count(c)>0 FROM Class c WHERE c.endDate <= :now AND c.status = true")
+    @Query("SELECT count(c)>0 FROM Class c WHERE c.endDate <= :now " +
+            "AND c.classId =:classId " +
+            "AND c.status = true")
     Boolean checkClassInTime(@Param("classId") Long classId,@Param("now") LocalDateTime now);
 }

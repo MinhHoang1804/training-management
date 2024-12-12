@@ -208,6 +208,7 @@ public class ClassServiceImpl implements IClassService {
                             .endTime(s.getEndDate())
                             .slot(schedule.getSlot())
                             .description(s.getDescription())
+                            .trainer(schedule.getTrainer())
                             .build();
                     return scheduleDetail;
                 }).toList();

@@ -23,10 +23,11 @@ public class ScheduleService implements IScheduleService {
     private final ModelMapper mapper;
 
     @Override
-    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate,Integer slot, List<SessionResponse.SessionInfoDTO> sessions) {
+    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate, List<SessionResponse.SessionInfoDTO> sessions) {
         List<ScheduleResponse.ScheDuleDetailsInfo> list = new ArrayList<>();
         LocalDate currentDate = startDate;
-
+        int countDay = 1;
+        int countSlot = 1;
         for (SessionResponse.SessionInfoDTO session : sessions) {
             // Skip weekends
             while (currentDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
@@ -42,15 +43,27 @@ public class ScheduleService implements IScheduleService {
             // Alternatively, set a custom time: currentDate.atTime(LocalTime.of(10, 0)); // 10:00 AM
 
             map.setDate(dateTime); // Assuming your `ScheDuleDetailsInfo` has a LocalDateTime field `dateTime`
-                dateTime.toLocalDate();
-            ScheduleResponse.TimeSlotInfo timeSlot = ScheduleResponse.TimeSlotInfo.getTimeSlot(slot,dateTime.toLocalDate());
+            dateTime.toLocalDate();
+            ScheduleResponse.TimeSlotInfo timeSlot = ScheduleResponse.TimeSlotInfo.getTimeSlot(countSlot, dateTime.toLocalDate());
 //            map.setDate(timeSlot.getStartDate());
             map.setStartDate(timeSlot.getStartDate());
             map.setEndDate(timeSlot.getEndDate());
             // Add schedule detail to the result list
             list.add(map);
-            // Move to the next day
-            currentDate = currentDate.plusDays(1);
+
+            //move slot
+            countSlot = countSlot == 1 ? 2 : 1;
+            System.out.println("count slot " +countSlot);
+
+            //move day
+            if(countSlot%2==1){
+                // Move to the next day
+                currentDate = currentDate.plusDays(1);
+            }
+//            if (countDay > 0 && countDay % 2 == 0) {
+//                // Move to the next day
+//                currentDate = currentDate.plusDays(1);
+//            }
         }
 
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);

@@ -55,7 +55,7 @@ public class ClassController {
 
     @PostMapping("/get-time-table-session")
     public ApiResponse<?> getTimeTableSession(@RequestBody ScheduleRequest.ScheduleGenerateDto model) {
-        return scheduleService.generateTimeTable(model.getStartDate(),model.getSlot(),model.getSessions());
+        return scheduleService.generateTimeTable(model.getStartDate(),model.getSessions());
     }
     @PostMapping("/accep-class")
     public ApiResponse<?> getTimeTableSession(ClassRequest.UpdateStatusClassFrom model) {

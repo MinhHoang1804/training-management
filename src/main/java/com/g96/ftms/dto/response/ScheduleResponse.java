@@ -37,20 +37,12 @@ public class ScheduleResponse {
 
             switch (slot) {
                 case 1:
-                    startDateTime = date.atTime(LocalTime.of(7, 30));
-                    endDateTime = date.atTime(LocalTime.of(9, 0));
+                    startDateTime = date.atTime(LocalTime.of(9, 0));
+                    endDateTime = date.atTime(LocalTime.of(11, 30));
                     break;
                 case 2:
-                    startDateTime = date.atTime(LocalTime.of(9, 30));
-                    endDateTime = date.atTime(LocalTime.of(11, 0));
-                    break;
-                case 3:
-                    startDateTime = date.atTime(LocalTime.of(13, 0)); // 1h chiều
-                    endDateTime = date.atTime(LocalTime.of(14, 30));
-                    break;
-                case 4:
-                    startDateTime = date.atTime(LocalTime.of(15, 0)); // 3h chiều
-                    endDateTime = date.atTime(LocalTime.of(16, 30));
+                    startDateTime = date.atTime(LocalTime.of(13, 0));
+                    endDateTime = date.atTime(LocalTime.of(17, 0));
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid slot: " + slot);

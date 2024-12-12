@@ -9,5 +9,5 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface IScheduleService {
-    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate,Integer slot, List<SessionResponse.SessionInfoDTO> sessions);
+    public ApiResponse<List<ScheduleResponse.ScheDuleDetailsInfo>> generateTimeTable(LocalDate startDate, List<SessionResponse.SessionInfoDTO> sessions);
 }
