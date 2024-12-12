@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -197,8 +198,10 @@ public class ClassServiceImpl implements IClassService {
         for (Schedule schedule : schedules) {
             ClassRequest.SubjectSessionDto subjectSessionDto = subjectSessionList.stream().filter(s -> s.getSubjectId() == schedule.getSubject().getSubjectId()).findFirst().orElse(null);
             if (subjectSessionDto != null) {
+                AtomicInteger count = new AtomicInteger(1); // Sử dụng AtomicInteger để có thể thay đổi giá trị
                 List<ScheduleDetail> list = subjectSessionDto.getSessionList().stream().map(s -> {
-                    ScheduleDetail scheduleDetail = ScheduleDetail.builder()
+                    int currentCount = count.getAndSet(count.get() == 1 ? 2 : 1); // Lấy giá trị hiện tại và cập nhật
+                    return ScheduleDetail.builder()
                             .sessionId(s.getSessionId())
                             .schedule(schedule)
                             .date(s.getDate())
@@ -206,11 +209,10 @@ public class ClassServiceImpl implements IClassService {
                             .status(false)
                             .startTime(s.getStartDate())
                             .endTime(s.getEndDate())
-                            .slot(schedule.getSlot())
+                            .slot(currentCount)
                             .description(s.getDescription())
                             .trainer(schedule.getTrainer())
                             .build();
-                    return scheduleDetail;
                 }).toList();
                 scheduleDetailList.addAll(list);
             }
