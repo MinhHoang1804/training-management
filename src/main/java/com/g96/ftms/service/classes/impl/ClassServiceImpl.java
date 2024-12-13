@@ -176,9 +176,9 @@ public class ClassServiceImpl implements IClassService {
         List<Schedule> scheduleList = new ArrayList<>();
 
         //clear all old schedule
-        for (Subject subject : subjectsInCurriculum) {
-            deleteSchedulesBySubjectAndClass(subject.getSubjectId(),c.getClassId());
-        }
+//        for (Subject subject : subjectsInCurriculum) {
+//            deleteSchedulesBySubjectAndClass(subject.getSubjectId(),c.getClassId());
+//        }
         //add new schedule
         for (Subject subject : subjectsInCurriculum) {
 
