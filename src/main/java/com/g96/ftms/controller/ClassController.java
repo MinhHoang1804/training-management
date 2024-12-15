@@ -67,5 +67,8 @@ public class ClassController {
         return classService.getClassUser(userId);
     }
 
+   @PutMapping public ApiResponse<?> updateClassSession(ClassRequest.UpdateSessionClassFrom model) {
+        return classService.updateScheduleClass(model);
+    }
 
 }

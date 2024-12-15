@@ -30,4 +30,6 @@ public interface IClassService {
     ApiResponse<?> checkClassInTime(Long classId);
 
     public void deleteSchedulesBySubjectAndClass(Long subjectId, Long classId);
+
+    ApiResponse<?> updateScheduleClass(ClassRequest.UpdateSessionClassFrom model);
 }

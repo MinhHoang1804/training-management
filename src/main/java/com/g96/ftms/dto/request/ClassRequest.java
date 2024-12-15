@@ -62,6 +62,13 @@ public class ClassRequest {
     public static class UpdateStatusClassFrom {
         private Long classId;
     }
-
+    @Data
+    @NoArgsConstructor
+    public static class UpdateSessionClassFrom {
+        private Long scheduleDetailId;
+        private String trainer;
+        private String session;
+        private LocalDateTime date;
+    }
 
 }

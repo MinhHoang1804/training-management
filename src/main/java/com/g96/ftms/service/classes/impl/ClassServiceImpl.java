@@ -274,6 +274,20 @@ public class ClassServiceImpl implements IClassService {
         scheduleRepository.deleteAll(schedules);
     }
 
+    @Override
+    public ApiResponse<?> updateScheduleClass(ClassRequest.UpdateSessionClassFrom model) {
+        Optional<ScheduleDetail> s = scheduleDetailRepository.findById(model.getScheduleDetailId());
+        if(s.isPresent()){
+            ScheduleDetail scheduleDetail = s.get();
+            scheduleDetail.setDate(model.getDate());
+            scheduleDetail.setLesson(model.getSession());
+            scheduleDetail.setTrainer(model.getTrainer());
+            scheduleDetailRepository.save(scheduleDetail);
+            return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+        }
+        return new ApiResponse<>(ErrorCode.BAD_REQUEST.getCode(), ErrorCode.OK.getMessage(), ErrorCode.SCHEDULE_NOT_FOUND);
+    }
+
     public void generateAttendanceList(List<ScheduleDetail> scheduleDetails, List<Long> userIds) {
         List<Attendance> attendanceList = new ArrayList<>();
         for (Long userId : userIds) {
