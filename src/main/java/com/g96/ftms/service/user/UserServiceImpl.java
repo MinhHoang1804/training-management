@@ -4,6 +4,10 @@ import com.g96.ftms.dto.ChangePasswordDTO;
 import com.g96.ftms.dto.JwtResponeDTO;
 import com.g96.ftms.dto.LoginDTO;
 import com.g96.ftms.dto.UserDTO;
+import com.g96.ftms.dto.common.PagedResponse;
+import com.g96.ftms.dto.request.UserRequest;
+import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.UserResponse;
 import com.g96.ftms.entity.Role;
 import com.g96.ftms.entity.User;
 import com.g96.ftms.exception.AppException;
@@ -12,15 +16,23 @@ import com.g96.ftms.mapper.Mapper;
 import com.g96.ftms.repository.RoleRepository;
 import com.g96.ftms.repository.UserRepository;
 import com.g96.ftms.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.g96.ftms.service.file.IImageStorageService;
+import com.g96.ftms.util.constants.CONTAINER_UPLOAD_ENUM;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,19 +41,23 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+
+    private final PasswordEncoder passwordEncoder;
+
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private final ModelMapper mapper;
+
+    private final IImageStorageService imageStorageService;
 
     @Override
     public User findByAccount(String account) {
@@ -180,7 +196,7 @@ public class UserServiceImpl implements UserService {
 
         int targetUserLevel = user.getHighestRoleLevel();
 
-        if (userRoleLevels.isPresent()&& userRoleLevels.get() <= targetUserLevel) {
+        if (userRoleLevels.isPresent() && userRoleLevels.get() <= targetUserLevel) {
             return Mapper.mapEntityToDto(user, UserDTO.class);
         }
 
@@ -198,12 +214,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED);
         }
 
-//        if (userDTO.getFullName() == null || userDTO.getEmail() == null ||
-//                userDTO.getPhone() == null || userDTO.getAccount() == null ||
-//                userDTO.getPassword() == null || userDTO.getRoles() == null) {
-//            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT);
-//        }
-
         Set<Role> roles = userDTO.getRoles().stream()
                 .map(roleName -> roleRepository.findByRoleName(roleName)
                         .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_INPUT)))
@@ -218,4 +228,80 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok("User created successfully");
     }
 
+    @Override
+    public ApiResponse<PagedResponse<UserResponse.UserInfoDTO>> search(UserRequest.UserPagingRequest model) {
+        String keywordFilter = model.getKeyword() == null ? null : "%" + model.getKeyword() + "%";
+        Page<User> pages = userRepository.searchFilter(keywordFilter, model.getStatus(), model.getRoleId(), model.getPageable());
+        List<UserResponse.UserInfoDTO> list = pages.getContent().stream().map(item -> {
+            UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
+            map.setRole(item.getRole());
+            return map;
+        }).toList();
+        PagedResponse<UserResponse.UserInfoDTO> response = new PagedResponse<>(list, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    @Override
+    public ApiResponse<?> updateProfile(UserRequest.UserEditProfileRequest model) {
+        // Lấy thông tin người dùng hiện tại từ SecurityContext
+        User user = getCurrentUser();
+//                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+
+        // Cập nhật thông tin từ model
+        if (model.getPhone() != null) user.setPhone(model.getPhone());
+        if (model.getEmergencyPhone() != null) user.setEmergencyPhone(model.getEmergencyPhone());
+        if (model.getAddress() != null) user.setAddress(model.getAddress());
+        if (model.getDateOfBirth() != null) user.setDateOfBirth(model.getDateOfBirth());
+
+        // Lưu lại thông tin đã được cập nhật
+        userRepository.save(user);
+
+        // Tạo response
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+    }
+
+    @Override
+    public ApiResponse<?> updateAvatar(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            String imageUrl = this.imageStorageService.uploadImage(CONTAINER_UPLOAD_ENUM.AVATAR.getValue(), file.getOriginalFilename(), inputStream, file.getSize());
+            User user = getCurrentUser();
+            user.setImgAva(imageUrl);
+            userRepository.save(user);
+            return new ApiResponse(HttpStatus.OK.toString(), imageUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.FILE_WRONG_FORMAT);
+        } catch (AppException e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public ApiResponse<List<UserResponse.UserInfoDTO>> findAdmin() {
+        List<User> list = userRepository.findByRole("ROLE_CLASS_ADMIN");
+        List<UserResponse.UserInfoDTO> response = list.stream().map(item -> {
+            UserResponse.UserInfoDTO map = mapper.map(item, UserResponse.UserInfoDTO.class);
+            map.setRole(item.getRole());
+            return map;
+        }).toList();
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        // Lấy thông tin người dùng hiện tại từ SecurityContext
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByAccount(currentUsername);
+        if (user == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.SESSION_EXPIRED);
+        }
+        return user;
+    }
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 }

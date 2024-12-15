@@ -14,4 +14,6 @@ public interface ICurriculumService {
     ApiResponse<Curriculum> createCurriculum(CurriculumRequest.CurriculumAddRequest model);
 
     ApiResponse<Curriculum> updateCurriculum(CurriculumRequest.CurriculumEditRequest model);
+
+    ApiResponse<?> checkUpdate(Long curriculumId);
 }

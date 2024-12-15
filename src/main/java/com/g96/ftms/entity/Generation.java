@@ -30,4 +30,8 @@ public class Generation {
     @OneToMany(mappedBy = "generation", fetch = FetchType.LAZY)
     @JsonBackReference
     private List<Settings> generations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "generation", fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<Class> classes;
 }

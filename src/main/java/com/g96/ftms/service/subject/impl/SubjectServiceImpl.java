@@ -1,29 +1,36 @@
 package com.g96.ftms.service.subject.impl;
 
-import com.g96.ftms.dto.SubjectDTO;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
+import com.g96.ftms.dto.request.TraineeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SchemeResponse;
+import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
-import com.g96.ftms.entity.MarkScheme;
-import com.g96.ftms.entity.Subject;
+import com.g96.ftms.entity.*;
+import com.g96.ftms.entity.Class;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
-import com.g96.ftms.repository.CurriculumRepository;
-import com.g96.ftms.repository.SchemeRepository;
-import com.g96.ftms.repository.SubjectRepository;
+import com.g96.ftms.repository.*;
 import com.g96.ftms.service.subject.ISubjectService;
+import com.g96.ftms.util.ExcelUltil;
 import com.g96.ftms.util.SqlBuilderUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,7 +43,10 @@ public class SubjectServiceImpl implements ISubjectService {
 
     private final CurriculumRepository curriculumRepository;
     private final SchemeRepository schemeRepository;
+    private final ClassRepository classRepository;
     private final ModelMapper mapper;
+
+    private final SessionRepository sessionRepository;
 
     @Override
     public ApiResponse<PagedResponse<Subject>> search(SubjectRequest.SubjectPagingRequest model) {
@@ -78,7 +88,6 @@ public class SubjectServiceImpl implements ISubjectService {
         schemeRepository.deleteBySubject_SubjectId(subject.getSubjectId());
 
         // set new scheme
-        List<SchemeResponse.SubjectSchemeInfo> schemes = model.getSchemes();
         List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
             MarkScheme scheme = mapper.map(s, MarkScheme.class);
             scheme.setStatus(true);
@@ -114,8 +123,22 @@ public class SubjectServiceImpl implements ISubjectService {
         }).collect(Collectors.toList());
         //create scheme
         schemeRepository.saveAll(schemeList);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+
+        //save lesson
+        List<SubjectRequest.SubjectLessonRequest> lessonList = model.getLessonList();
+        List<Session> sessionList = lessonList.stream()
+                .map(lesson -> {
+                    Session session = new Session();
+                    session.setLesson(lesson.getLesson());
+                    session.setDescription(lesson.getDescription());
+                    session.setSessionOrder(lesson.getSessionOrder());
+                    session.setSubject(subject);
+                    return session;
+                }).collect(Collectors.toList());
+        sessionRepository.saveAll(sessionList);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),subject);
     }
+
 
     @Override
     public ApiResponse<List<SubjectResponse.SubjectOptionDTO>> getAllSubjectOption() {
@@ -124,5 +147,27 @@ public class SubjectServiceImpl implements ISubjectService {
         }.getType());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
+
+    public List<Subject> getSubjectInClass(Long classId){
+        Class c = classRepository.findById(classId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
+        return c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
+    }
+
+    @Override
+    public ApiResponse<?> checkUpdate(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() ->
+                new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
+        List<Class> collect = subject.getSchedules().stream().map(Schedule::getClasss).collect(Collectors.toList());
+        boolean check=true;
+        for (Class c:collect) {
+            Boolean ck = classRepository.checkClassInTime(c.getClassId(), LocalDateTime.now());
+            if(ck){ //have class in time
+                check=false;
+            }
+        }
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
+    }
+
 
 }

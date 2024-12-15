@@ -1,31 +1,25 @@
 package com.g96.ftms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 import java.sql.Date;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +30,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -82,8 +77,20 @@ public class User {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
+    @Column(name = "status")
+    private Boolean status;
+
+    @CreatedDate
     @Column(name = "created_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private java.util.Date createdDate;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<UserClassRelation> userClassRelationList;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<FeedBack> feedBackList;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
@@ -91,6 +98,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+
 
     @JsonIgnore
     private Set<Role> roles = new HashSet<>();
@@ -102,6 +110,7 @@ public class User {
                 .map(Role::getRoleName)
                 .orElse(null);
     }
+
     @JsonProperty("roleNames")
     public String getRoleNames() {
         return roles.stream()
@@ -117,6 +126,13 @@ public class User {
                 .orElse(0);
     }
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Grade> grades;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonBackReference
+    List<Attendance> adAttendanceList;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<GradeSummary> gradeSummaryList;
 }

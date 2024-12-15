@@ -1,8 +1,6 @@
 package com.g96.ftms.exception; // Thay đổi theo cấu trúc gói của bạn
 
-import com.g96.ftms.entity.Subject;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 
@@ -31,11 +29,24 @@ public enum ErrorCode {
     DUPLICATE_SUBJECT_NAME("ERR022","Tên môn học đã tồn tại"),
     DUPLICATE_SUBJECT_CODE("ERR023","Mã môn học đã tồn tại"),
     DUPLICATE_CURRICULUM_NAME("ERR024","Tên chương trình học đã tồn tại"),
-    ROOM_NOT_FOUND("ERR025","Không tìm thấy tên phòng"),
+    LOCATION_NOT_FOUND("ERR025","Không tìm thấy địa chỉ"),
     GENERATION_NAME_SETTING_EXIST("ERR026","Setting cho generation này đã tồn tại"),
     SETTING_NOTFOUND("ERR027","Không tìm thấy setting"),
     GENERATION_NOT_FOUND("ERR028","Generation này không tồn tại"),
-    DUPLICATE_SETTING("ERR028","Setting đã tồn tại");
+    DUPLICATE_SETTING("ERR029","Setting đã tồn tại"),
+    CLASS_NOT_FOUND("ERR030","Không tìm thấy lớp học"),
+    QUESTION_TYPE_WRONG_FORMAT("ERR031","Sai định dạng câu hỏi"),
+    QUESTION_NOT_FOUND("ERR032","Không tìm thấy câu hỏi"),
+    FEEDBACK_NOT_FOUND("ERR033","Không tìm thấy form feedback"),
+    FILE_EMPTY("ERR034","File trống "),
+    FILE_WRONG_FORMAT("ERR035","File sai format"),
+    EXPORT_FAILED("ERR036","Đã có lỗi xảy ra"),
+    SCHEME_NOT_FOUND("ERR037","Không tìm thấy điểm thành phần"),
+    SCHEME_NOT_FOUND_IN_SUBJECT("ERR038","Không tìm thấy điểm thành phần này ở môn học"),
+    USER_FEEDBACK_EXIST("ERR039","Ngươi dùng này đã feedback"),
+    SCHEDULE_NOT_FOUND("ERR040","Không tìm thấy lịch học cho môn này"),
+    UPLOAD_FILE_FAILED("ERR041","Đã có lỗi xảy ra trong quá trình tải file"),
+    SESSION_EXPIRED("ERR042","Phiên đăng nhập hết hạn");
     private final String code;
     private final String message;
 

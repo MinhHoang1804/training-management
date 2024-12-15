@@ -5,12 +5,14 @@ import com.g96.ftms.dto.request.CurriculumRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.CurriculumnResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
+import com.g96.ftms.entity.Class;
 import com.g96.ftms.entity.Curriculum;
 import com.g96.ftms.entity.CurriculumSubjectRelation;
 import com.g96.ftms.entity.CurriculumSubjectRelationId;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
+import com.g96.ftms.repository.ClassRepository;
 import com.g96.ftms.repository.CurriculumRepository;
 import com.g96.ftms.repository.CurriculumSubjectRepository;
 import com.g96.ftms.repository.SubjectRepository;
@@ -22,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +36,8 @@ public class CurriculumServiceImpl implements ICurriculumService {
     private final ModelMapper mapper;
     private final SubjectRepository subjectRepository;
     private final CurriculumSubjectRepository curriculumSubjectRepository;
+
+    private final ClassRepository classRepository;
 
     @Override
     public ApiResponse<PagedResponse<Curriculum>> search(CurriculumRequest.CurriculumPagingRequest model) {
@@ -110,6 +115,20 @@ public class CurriculumServiceImpl implements ICurriculumService {
         //save relation
         addBatchSubjectCurriculumRelation(curriculum, model.getSubjectList());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+    }
+
+    @Override
+    public ApiResponse<?> checkUpdate(Long curriculumId) {
+        Curriculum curriculum = curriculumRepository.findById(curriculumId).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, ErrorCode.CURRICULUM_NOT_FOUND));
+        List<Class> collect = curriculum.getClasses();
+        boolean check = true;
+        for (Class c : collect) {
+            Boolean ck = classRepository.checkClassInTime(c.getClassId(), LocalDateTime.now());
+            if (ck) { //have class in time
+                check = false;
+            }
+        }
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
     }
 
     public void addBatchSubjectCurriculumRelation(Curriculum curriculum, List<CurriculumRequest.CurriculumSubjectAdd> subjectList) {

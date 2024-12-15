@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -33,8 +34,14 @@ public class MarkScheme {
     @Column(name = "mark_weight")
     private Double markWeight;
 
+    @Column(name="dateLock")
+    private LocalDateTime dateLock;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id")
     private Subject subject;
+
+    @OneToMany(mappedBy = "markScheme", fetch = FetchType.LAZY)
+    private List<Grade> grades;
 
 }

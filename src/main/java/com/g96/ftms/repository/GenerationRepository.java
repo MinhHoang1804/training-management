@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface GenerationRepository  extends JpaRepository<Generation, Long> {
-    boolean existsByGenerationName(String generationName);
+    boolean existsByGenerationNameAndGetGenerationIdNot(String generationName, Long getGenerationId);
 
     Optional<Generation> findByGenerationName(String generationName);
 }

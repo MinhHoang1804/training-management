@@ -10,11 +10,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SettingsRepository extends JpaRepository<Settings, Long> {
+    boolean existsByDescriptionAndLocation_LocationNameAndSettingIdNot(String description, String locationName, Long settingId);
+    boolean existsByDescriptionAndLocation_LocationName(String description, String locationName);
+    boolean existsByDescriptionAndGeneration_GenerationName(String description, String generationName);
     @Query("SELECT s FROM Settings s " +
-            "LEFT JOIN s.room r " +
+            "LEFT JOIN s.location r " +
             "LEFT JOIN s.generation g " +
             "WHERE (:keyword IS NULL OR s.description LIKE %:keyword% " +
-            "OR r.roomName LIKE %:keyword% " +
+            "OR r.locationName LIKE %:keyword% " +
             "OR g.generationName LIKE %:keyword%) " +
             "AND (:status IS NULL OR s.status = :status)")
     Page<Settings> searchAndFilter(
@@ -24,4 +27,12 @@ public interface SettingsRepository extends JpaRepository<Settings, Long> {
     );
 
     Settings findByDescription(String description);
+
+    boolean existsByGeneration_GenerationName(String generationName);
+
+    boolean existsByLocation_LocationName(String locationName);
+
+    boolean existsByLocation_LocationNameAndSettingIdNot(String locationName, Long settingId);
+
+    boolean existsByGeneration_GenerationNameAndSettingIdNot(String generationName, Long settingId);
 }

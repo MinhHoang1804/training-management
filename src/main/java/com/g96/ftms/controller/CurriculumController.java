@@ -33,4 +33,9 @@ public class CurriculumController {
     public ApiResponse<?> createCurriculum(@RequestBody  CurriculumRequest.CurriculumAddRequest model) {
        return curriculumService.createCurriculum(model);
     }
+
+    @GetMapping("/check-update/{id}")
+    public ApiResponse<?> checkUpdate(@PathVariable("id") Long curriculumId) {
+        return curriculumService.checkUpdate(curriculumId);
+    }
 }
