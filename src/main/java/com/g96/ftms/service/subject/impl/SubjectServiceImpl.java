@@ -96,11 +96,20 @@ public class SubjectServiceImpl implements ISubjectService {
         }).toList();
         //save scheme
         List<MarkScheme> schemeListSaved = schemeRepository.saveAll(schemeList);
-
         //save data
+        //set newSession
+        List<Session> sessionList = model.getLessonList().stream().map(s -> {
+            Session session = mapper.map(s, Session.class);
+            session.setLesson(s.getDescription());
+            session.setSubject(subject);
+            session.setSessionId(s.getSessionId());
+            return session;
+        }).toList();
+        List<Session> sessionSaved = sessionRepository.saveAll(sessionList);
         Subject map = mapper.map(model, Subject.class);
         map.setSubjectId(model.getId());
         map.setMarkSchemeList(schemeListSaved);
+        map.setSessionsList(sessionSaved);
         subjectRepository.save(map);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
     }

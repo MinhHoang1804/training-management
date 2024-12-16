@@ -49,6 +49,7 @@ public class SubjectRequest {
     @Data
     @NoArgsConstructor
     public static class SubjectLessonRequest{
+        private Long sessionId;
         private String lesson;
         private Integer sessionOrder;
         private String description;
