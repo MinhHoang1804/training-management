@@ -2,6 +2,7 @@ package com.g96.ftms.dto.request;
 
 import com.g96.ftms.dto.common.PagingBaseParams;
 import com.g96.ftms.dto.response.SchemeResponse;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +23,7 @@ public class SubjectRequest {
 //        private String documentLink;
         private String descriptions;
         private boolean status;
-        List<SubjectSchemeaddRequest>schemes;
+        List<SubjectSchemeAddRequest>schemes;
         List<SubjectLessonRequest>lessonList;
     }
     @Data
@@ -33,9 +34,16 @@ public class SubjectRequest {
 
     @Data
     @NoArgsConstructor
-    public static class SubjectSchemeaddRequest {
+    @AllArgsConstructor
+    public static class SubjectSchemeAddRequest {
+        private Long markSchemeId;
         private String markName;
         private Double markWeight;
+
+        public SubjectSchemeAddRequest(String markName, Double markWeight) {
+            this.markName = markName;
+            this.markWeight = markWeight;
+        }
     }
 
     @Data

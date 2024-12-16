@@ -85,7 +85,7 @@ public class SubjectServiceImpl implements ISubjectService {
             throw new AppException(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATE_SUBJECT_CODE);
         }
         //delete all relation
-        schemeRepository.deleteBySubject_SubjectId(subject.getSubjectId());
+//        schemeRepository.deleteBySubject_SubjectId(subject.getSubjectId());
 
         // set new scheme
         List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
