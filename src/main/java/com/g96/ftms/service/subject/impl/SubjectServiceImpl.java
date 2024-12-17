@@ -2,10 +2,8 @@ package com.g96.ftms.service.subject.impl;
 
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
-import com.g96.ftms.dto.request.TraineeRequest;
 import com.g96.ftms.dto.response.ApiResponse;
 import com.g96.ftms.dto.response.SchemeResponse;
-import com.g96.ftms.dto.response.SessionResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
 import com.g96.ftms.entity.*;
 import com.g96.ftms.entity.Class;
@@ -13,22 +11,15 @@ import com.g96.ftms.exception.AppException;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.repository.*;
 import com.g96.ftms.service.subject.ISubjectService;
-import com.g96.ftms.util.ExcelUltil;
 import com.g96.ftms.util.SqlBuilderUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,30 +79,43 @@ public class SubjectServiceImpl implements ISubjectService {
 //        schemeRepository.deleteBySubject_SubjectId(subject.getSubjectId());
 
         // set new scheme
-        List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
-            MarkScheme scheme = mapper.map(s, MarkScheme.class);
-            scheme.setStatus(true);
-            scheme.setSubject(subject);
-            return scheme;
-        }).toList();
-        //save scheme
-        List<MarkScheme> schemeListSaved = schemeRepository.saveAll(schemeList);
+        subject.setSubjectCode(model.getSubjectCode());
+        subject.setSubjectName(model.getSubjectName());
+        subject.setDescriptions(model.getDescriptions());
+        subject.setStatus(model.isStatus());
+        if (model.getSchemes() != null) {
+            List<Long> ids = model.getSchemes().stream().filter(s -> s.getMarkSchemeId() != null).map(SubjectRequest.SubjectSchemeAddRequest::getMarkSchemeId).collect(Collectors.toList());
+            //remove all
+            schemeRepository.removeRangeExclude(ids);
+            List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
+                MarkScheme scheme = mapper.map(s, MarkScheme.class);
+                scheme.setStatus(true);
+                scheme.setSubject(subject);
+                return scheme;
+            }).toList();
+            //save scheme
+            List<MarkScheme> schemeListSaved = schemeRepository.saveAll(schemeList);
+            subject.setMarkSchemeList(schemeListSaved);
+        }
         //save data
         //set newSession
-        List<Session> sessionList = model.getLessonList().stream().map(s -> {
-            Session session = mapper.map(s, Session.class);
-            session.setLesson(s.getDescription());
-            session.setSubject(subject);
-            session.setSessionId(s.getSessionId());
-            return session;
-        }).toList();
-        List<Session> sessionSaved = sessionRepository.saveAll(sessionList);
-        Subject map = mapper.map(model, Subject.class);
-        map.setSubjectId(model.getId());
-        map.setMarkSchemeList(schemeListSaved);
-        map.setSessionsList(sessionSaved);
-        subjectRepository.save(map);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), map);
+        if (model.getLessonList() != null) {
+            List<Long> ids = model.getLessonList().stream().filter(s -> s.getSessionId() != null).map(SubjectRequest.SubjectLessonRequest::getSessionId).collect(Collectors.toList());
+            //remove all
+            sessionRepository.removeRangeExclude(ids);
+            List<Session> sessionList = model.getLessonList().stream().map(s -> {
+                Session session = mapper.map(s, Session.class);
+                session.setLesson(s.getDescription());
+                session.setSubject(subject);
+                session.setSessionId(s.getSessionId());
+                return session;
+            }).toList();
+            List<Session> sessionSaved = new ArrayList<>();
+            sessionSaved = sessionRepository.saveAll(sessionList);
+            subject.setSessionsList(sessionSaved);
+        }
+        subjectRepository.save(subject);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), subject);
     }
 
     @Override
@@ -145,7 +149,7 @@ public class SubjectServiceImpl implements ISubjectService {
                     return session;
                 }).collect(Collectors.toList());
         sessionRepository.saveAll(sessionList);
-        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(),subject);
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), subject);
     }
 
 
@@ -157,7 +161,7 @@ public class SubjectServiceImpl implements ISubjectService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
-    public List<Subject> getSubjectInClass(Long classId){
+    public List<Subject> getSubjectInClass(Long classId) {
         Class c = classRepository.findById(classId).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
         return c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
@@ -167,12 +171,15 @@ public class SubjectServiceImpl implements ISubjectService {
     public ApiResponse<?> checkUpdate(Long subjectId) {
         Subject subject = subjectRepository.findById(subjectId).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.SUBJECT_NOT_FOUND));
-        List<Class> collect = subject.getSchedules().stream().map(Schedule::getClasss).collect(Collectors.toList());
-        boolean check=true;
-        for (Class c:collect) {
-            Boolean ck = classRepository.checkClassInTime(c.getClassId(), LocalDateTime.now());
-            if(ck){ //have class in time
-                check=false;
+        List<Class> collect = subject.getSchedules().stream().map(Schedule::getClasss).toList();
+        boolean check = true;
+        for (Class c : collect) {
+            Boolean ck = classRepository.countClassesInTime(c.getClassId(), LocalDateTime.now()) > 0;
+            if (ck) { //have class in time
+                check = false;
+            }
+            if (c.getStatus()) {
+                check = false;
             }
         }
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);

@@ -263,7 +263,7 @@ public class ClassServiceImpl implements IClassService {
 
     @Override
     public ApiResponse<?> checkClassInTime(Long classId) {
-        Boolean check = classRepository.checkClassInTime(classId, LocalDateTime.now());
+        Boolean check = classRepository.countClassesInTime(classId, LocalDateTime.now())>0;
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
     }
 

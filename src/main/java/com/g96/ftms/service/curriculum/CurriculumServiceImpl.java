@@ -123,7 +123,7 @@ public class CurriculumServiceImpl implements ICurriculumService {
         List<Class> collect = curriculum.getClasses();
         boolean check = true;
         for (Class c : collect) {
-            Boolean ck = classRepository.checkClassInTime(c.getClassId(), LocalDateTime.now());
+            Boolean ck = classRepository.countClassesInTime(c.getClassId(), LocalDateTime.now())>0;
             if (ck) { //have class in time
                 check = false;
             }
