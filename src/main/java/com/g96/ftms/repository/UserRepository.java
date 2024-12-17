@@ -65,4 +65,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
                               @Param("status") Boolean status,
                               @Param("classId") Long classId,
                               Pageable pageable);
+
+    @Query("SELECT u FROM User u JOIN u.userClassRelationList r " +
+            "JOIN u.roles ro " +
+            "WHERE r.classs.classId <> :classId " +
+            "AND ro.roleName = 'ROLE_TRAINEE'")
+    List<User> findUsersNotInClassId(@Param("classId") Long classId);
 }

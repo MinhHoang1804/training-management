@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -83,6 +84,14 @@ public class TraineeSerivce implements ITraineeService {
         }).toList();
         userClassRelationRepository.deleteAllById(list);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), "Success");
+    }
+
+    @Override
+    public ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeNotInClass(Long classId) {
+        List<User> users = userRepository.findUsersNotInClassId(classId);
+        List<TraineeResponse.TraineeInfoDTO> list = mapper.map(users, new TypeToken<List<TraineeResponse.TraineeInfoDTO>>() {
+        }.getType());
+        return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);
     }
 
     private List<TraineeRequest.TraineeAddRequest> readExcelFile(MultipartFile file) throws IOException {
