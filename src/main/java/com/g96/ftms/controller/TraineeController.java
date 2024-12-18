@@ -27,9 +27,9 @@ public class TraineeController {
     public ApiResponse<?> importTrainees( @RequestParam("classId") Long classId ,@Parameter(description = "File Excel to upload") @RequestParam("file") MultipartFile file) {
             return traineeService.importExcelFile(file,classId);
     }
-    @PostMapping(value = "/get-trainee-not-in-class/{classId}")
-    public ApiResponse<?> getTraineeNotInClass( @PathVariable("classId") Long classId ) {
-        return traineeService.getTraineeNotInClass(classId);
+    @PostMapping(value = "/get-trainee-not-in-class")
+    public ApiResponse<?> getTraineeNotInClass() {
+        return traineeService.getTraineeNotInClass();
     }
 
     @PostMapping(value = "/remove-trainee-by-class")

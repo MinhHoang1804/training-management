@@ -15,4 +15,8 @@ public interface SchemeRepository  extends JpaRepository<MarkScheme, Long> {
     @Modifying
     @Query("DELETE FROM MarkScheme s WHERE s.markSchemeId NOT IN :ids")
     void removeRangeExclude(List<Long> ids);
+
+    @Modifying
+    @Query("UPDATE MarkScheme ms SET ms.grades = null, ms.subject = null WHERE ms.markSchemeId IN :ids")
+    void clearGradesAndSubject(List<Long> ids);
 }

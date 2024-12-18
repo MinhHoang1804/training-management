@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -84,9 +85,10 @@ public class SubjectServiceImpl implements ISubjectService {
         subject.setDescriptions(model.getDescriptions());
         subject.setStatus(model.isStatus());
         if (model.getSchemes() != null) {
-            List<Long> ids = model.getSchemes().stream().filter(s -> s.getMarkSchemeId() != null).map(SubjectRequest.SubjectSchemeAddRequest::getMarkSchemeId).collect(Collectors.toList());
             //remove all
-            schemeRepository.removeRangeExclude(ids);
+            List<Long> ids = model.getSchemes().stream().filter(s -> s.getMarkSchemeId() != null).map(SubjectRequest.SubjectSchemeAddRequest::getMarkSchemeId).collect(Collectors.toList());
+            removeRangeMarkScheme(ids);
+
             List<MarkScheme> schemeList = model.getSchemes().stream().map(s -> {
                 MarkScheme scheme = mapper.map(s, MarkScheme.class);
                 scheme.setStatus(true);
@@ -185,5 +187,12 @@ public class SubjectServiceImpl implements ISubjectService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), check);
     }
 
+    public void removeRangeMarkScheme(List<Long> ids) {
+        // Xóa quan hệ grades và subject
+        schemeRepository.clearGradesAndSubject(ids);
+
+        // Xóa các MarkScheme không nằm trong danh sách ids
+        schemeRepository.removeRangeExclude(ids);
+    }
 
 }

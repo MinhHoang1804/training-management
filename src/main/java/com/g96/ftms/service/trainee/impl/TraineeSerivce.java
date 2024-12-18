@@ -87,8 +87,8 @@ public class TraineeSerivce implements ITraineeService {
     }
 
     @Override
-    public ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeNotInClass(Long classId) {
-        List<User> users = userRepository.findUsersNotInClassId(classId);
+    public ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeNotInClass() {
+        List<User> users = userRepository.findUsersNotInAnyClass();
         List<TraineeResponse.TraineeInfoDTO> list = mapper.map(users, new TypeToken<List<TraineeResponse.TraineeInfoDTO>>() {
         }.getType());
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), list);

@@ -15,5 +15,5 @@ public interface ITraineeService {
 
     ApiResponse<?> removeTrainee(TraineeRequest.TraineeRemoveRequest model);
 
-    ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeNotInClass(Long classId);
+    ApiResponse<List<TraineeResponse.TraineeInfoDTO>> getTraineeNotInClass();
 }
