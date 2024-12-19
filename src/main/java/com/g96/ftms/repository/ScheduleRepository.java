@@ -13,7 +13,8 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     long deleteBySubject_SubjectIdAndClasss_ClassId(Long subjectId, Long classId);
     List<Schedule> findByClasss_ClassIdAndSubject_SubjectId(Long classId, Long subjectId);
-    @Query("SELECT distinct s.trainer FROM Schedule s WHERE s.startDate <= :startDate AND s.endDate >= :endDate")
+    @Query("SELECT DISTINCT s.trainer FROM Schedule s WHERE " +
+            "(s.startDate <= :endDate AND s.endDate >= :startDate)")
     List<String> findTraineesInRangeAndSlot(
                                             @Param("startDate") LocalDateTime startDate,
                                             @Param("endDate") LocalDateTime endDate);
