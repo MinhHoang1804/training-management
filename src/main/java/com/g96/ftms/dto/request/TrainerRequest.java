@@ -11,9 +11,6 @@ public class TrainerRequest {
     @NoArgsConstructor
     public static class TrainerForClassRequest {
         @Valid
-        Integer slot;
-
-        @Valid
         LocalDateTime startDate;
 
         @Valid

@@ -143,7 +143,7 @@ public class ClassServiceImpl implements IClassService {
     @Override
     public ApiResponse<List<TrainerResponse.TrainerInfoDTO>> getTrainerForClass(TrainerRequest.TrainerForClassRequest model) {
         //get list trainer inrange
-        List<String> traineeUnAvailable = scheduleRepository.findTraineesInRangeAndSlot(model.getSlot(), model.getStartDate(), model.getEndDate());
+        List<String> traineeUnAvailable = scheduleRepository.findTraineesInRangeAndSlot(model.getStartDate(), model.getEndDate());
 
         List<User> roleTrainer = userRepository.findByRoleAvail("ROLE_TRAINER", traineeUnAvailable);
         List<TrainerResponse.TrainerInfoDTO> trainerList = mapper.map(roleTrainer, new TypeToken<List<TrainerResponse.TrainerInfoDTO>>() {
