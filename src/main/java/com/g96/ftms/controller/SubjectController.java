@@ -2,6 +2,7 @@ package com.g96.ftms.controller;
 
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.SubjectResponse;
 import com.g96.ftms.entity.Subject;
 import com.g96.ftms.exception.ErrorCode;
 import com.g96.ftms.service.subject.ISubjectService;
@@ -40,7 +41,7 @@ public class SubjectController {
     }
     @GetMapping("/get-subject-in-class/{id}")
     public ApiResponse<?> getsubjectInClass(@PathVariable("id") Long classId) {
-        List<Subject> subjectInClass = subjectService.getSubjectInClass(classId);
+        SubjectResponse.SubjectClassInfo subjectInClass = subjectService.getSubjectInClass(classId);
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), subjectInClass);
 
     }

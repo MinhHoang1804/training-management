@@ -3,6 +3,7 @@ package com.g96.ftms.service.subject.impl;
 import com.g96.ftms.dto.common.PagedResponse;
 import com.g96.ftms.dto.request.SubjectRequest;
 import com.g96.ftms.dto.response.ApiResponse;
+import com.g96.ftms.dto.response.ClassReponse;
 import com.g96.ftms.dto.response.SchemeResponse;
 import com.g96.ftms.dto.response.SubjectResponse;
 import com.g96.ftms.entity.*;
@@ -163,10 +164,16 @@ public class SubjectServiceImpl implements ISubjectService {
         return new ApiResponse<>(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage(), response);
     }
 
-    public List<Subject> getSubjectInClass(Long classId) {
+    public SubjectResponse.SubjectClassInfo getSubjectInClass(Long classId) {
         Class c = classRepository.findById(classId).orElseThrow(() ->
                 new AppException(HttpStatus.NOT_FOUND, ErrorCode.CLASS_NOT_FOUND));
-        return c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
+        ClassReponse.ClassInforDTO classInforDTO = mapper.map(c, ClassReponse.ClassInforDTO.class);
+        List<Subject> list = c.getCurriculum().getCurriculumSubjectRelationList().stream().map(CurriculumSubjectRelation::getSubject).toList();
+        SubjectResponse.SubjectClassInfo response=SubjectResponse.SubjectClassInfo.builder()
+                .listSubject(list)
+                .aClass(classInforDTO)
+                .build();
+        return response;
     }
 
     @Override

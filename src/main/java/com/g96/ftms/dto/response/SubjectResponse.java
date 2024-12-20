@@ -1,5 +1,6 @@
 package com.g96.ftms.dto.response;
 
+import com.g96.ftms.entity.Subject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,5 +36,14 @@ public class SubjectResponse {
         private String documentLink;
         private String descriptions;
         private boolean status;
+    }
+
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    public static class SubjectClassInfo {
+      private ClassReponse.ClassInforDTO aClass;
+      private List<Subject>listSubject;
     }
 }
